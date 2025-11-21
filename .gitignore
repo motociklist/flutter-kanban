@@ -1,0 +1,11 @@
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-deps
+.flutter-plugins-deps
+.idea/
+.vscode/
+android/.gradle
+**/gradle-wrapper.jar
