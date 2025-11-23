@@ -23,21 +23,27 @@ class _LoginPageState extends State<LoginPage> {
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() => _loading = false);
       debugPrint('Login with $_email / $_password');
+      // Directly mark user as logged in so main shows Kanban page
       widget.onLogin();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none);
+    final border = OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none);
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+            gradient: LinearGradient(
+                colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight),
           ),
           child: Center(
             child: SingleChildScrollView(
@@ -48,12 +54,19 @@ class _LoginPageState extends State<LoginPage> {
                   // Logo / header
                   Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(color: Colors.white.withAlpha(31), borderRadius: BorderRadius.circular(16)),
+                    decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(31),
+                        borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       children: const [
-                        Icon(Icons.dashboard_customize, size: 64, color: Colors.white),
+                        Icon(Icons.dashboard_customize,
+                            size: 64, color: Colors.white),
                         SizedBox(height: 8),
-                        Text('Welcome to Kanban+', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        Text('Welcome to Kanban+',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -62,7 +75,12 @@ class _LoginPageState extends State<LoginPage> {
                   // Card container
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 12)]),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(color: Colors.black12, blurRadius: 12)
+                        ]),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -79,7 +97,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             keyboardType: TextInputType.emailAddress,
                             onSaved: (v) => _email = v ?? '',
-                            validator: (v) => (v == null || v.isEmpty) ? 'Enter email' : null,
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? 'Enter email' : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
@@ -94,34 +113,47 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             obscureText: true,
                             onSaved: (v) => _password = v ?? '',
-                            validator: (v) => (v == null || v.length < 4) ? 'Password too short' : null,
+                            validator: (v) => (v == null || v.length < 4)
+                                ? 'Password too short'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                                 backgroundColor: const Color(0xFF7E57C2),
                                 elevation: 4,
                               ),
                               onPressed: _loading ? null : _submit,
                               child: _loading
-                                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                  : const Text('Login', style: TextStyle(fontSize: 16)),
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2))
+                                  : const Text('Login',
+                                      style: TextStyle(fontSize: 16)),
                             ),
                           ),
                           const SizedBox(height: 12),
                           TextButton(
                             onPressed: () async {
-                              final registered = await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RegisterPage()));
+                              final registered = await Navigator.of(context)
+                                  .push(MaterialPageRoute(
+                                      builder: (_) => const RegisterPage()));
                               if (registered == true) {
                                 if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration successful — please login')));
+                                // After successful registration, log the user in immediately
+                                widget.onLogin();
                               }
                             },
-                            child: const Text("Don't have an account? Register"),
+                            child:
+                                const Text("Don't have an account? Register"),
                           ),
                         ],
                       ),
