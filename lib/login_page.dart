@@ -122,11 +122,9 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                backgroundColor: const Color(0xFF7E57C2),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                backgroundColor: const Color(0xFFFFA726), // vibrant orange
                                 elevation: 4,
                               ),
                               onPressed: _loading ? null : _submit,
@@ -134,26 +132,23 @@ class _LoginPageState extends State<LoginPage> {
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,
-                                      child: CircularProgressIndicator(
-                                          color: Colors.white, strokeWidth: 2))
-                                  : const Text('Login',
-                                      style: TextStyle(fontSize: 16)),
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                  : const Text('Login', style: TextStyle(fontSize: 16, color: Colors.white)),
                             ),
                           ),
                           const SizedBox(height: 12),
                           TextButton(
+                            style: TextButton.styleFrom(foregroundColor: const Color(0xFF42A5F5)),
                             onPressed: () async {
                               final registered = await Navigator.of(context)
-                                  .push(MaterialPageRoute(
-                                      builder: (_) => const RegisterPage()));
+                                  .push(MaterialPageRoute(builder: (_) => const RegisterPage()));
                               if (registered == true) {
                                 if (!mounted) return;
                                 // After successful registration, log the user in immediately
                                 widget.onLogin();
                               }
                             },
-                            child:
-                                const Text("Don't have an account? Register"),
+                            child: const Text("Don't have an account? Register"),
                           ),
                         ],
                       ),

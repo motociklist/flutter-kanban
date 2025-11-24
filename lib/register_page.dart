@@ -113,16 +113,19 @@ class _RegisterPageState extends State<RegisterPage> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              style: AppStyles.elevatedButtonStyle(),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                backgroundColor: const Color(0xFFFFA726), // blue register
+                                elevation: 4,
+                              ),
                               onPressed: _loading ? null : _submit,
                               child: _loading
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,
-                                      child: CircularProgressIndicator(
-                                          color: Colors.white, strokeWidth: 2))
-                                  : const Text('Register',
-                                      style: TextStyle(fontSize: 16)),
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                  : const Text('Register', style: TextStyle(fontSize: 16)),
                             ),
                           ),
                         ],

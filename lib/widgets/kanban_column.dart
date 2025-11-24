@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/kanban_task.dart';
+import 'kanban_card.dart';
 
 typedef OnTaskDropped = void Function(KanbanTask task, KanbanStatus toStatus);
 
@@ -57,11 +58,11 @@ class KanbanColumn extends StatelessWidget {
                                     color: Colors.transparent,
                                     child: ConstrainedBox(
                                       constraints: BoxConstraints(maxWidth: 260),
-                                      child: _buildCard(context, t, isDragging: true),
+                                      child: KanbanCard(task: t, isDragging: true, colorForStatus: _colorForStatus),
                                     ),
                                   ),
-                                  childWhenDragging: Opacity(opacity: 0.4, child: _buildCard(context, t)),
-                                  child: _buildCard(context, t),
+                                  childWhenDragging: Opacity(opacity: 0.4, child: KanbanCard(task: t, colorForStatus: _colorForStatus)),
+                                  child: KanbanCard(task: t, colorForStatus: _colorForStatus),
                                 ),
                               ))
                           .toList(),
@@ -76,30 +77,7 @@ class KanbanColumn extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(BuildContext context, KanbanTask task, {bool isDragging = false}) {
-    final bg = task.color ?? _colorForStatus(task.status, context);
-    final textColor = ThemeData.estimateBrightnessForColor(bg) == Brightness.dark ? Colors.white : Colors.black87;
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: isDragging ? [BoxShadow(color: Colors.black26, blurRadius: 8)] : [BoxShadow(color: Colors.black12, blurRadius: 4)],
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(task.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
-          if (task.description != null) ...[
-            SizedBox(height: 6),
-            Text(task.description!, style: TextStyle(fontSize: 13, color: textColor.withAlpha(230))),
-          ]
-        ],
-      ),
-    );
-  }
+  
 
   Color _colorForStatus(KanbanStatus status, BuildContext context) {
     switch (status) {
