@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'register_page.dart';
+import 'services/firebase_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onLogin;
@@ -11,21 +13,57 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final _authService = FirebaseAuthService();
   String _email = '';
   String _password = '';
   bool _loading = false;
+  String? _errorMessage;
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
-    setState(() => _loading = true);
-    // Simulate a short auth delay.
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() => _loading = false);
-      debugPrint('Login with $_email / $_password');
-      // Directly mark user as logged in so main shows Kanban page
-      widget.onLogin();
+
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
     });
+
+    try {
+      final result = await _authService.signInWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
+
+      if (result != null && mounted) {
+        debugPrint('Login successful: ${_email}');
+        // Вход успешен - Firebase authStateChanges обновит состояние автоматически
+        // Небольшая задержка для обновления authStateChanges
+        await Future.delayed(const Duration(milliseconds: 500));
+        // Закрыть страницу входа
+        if (mounted) {
+          Navigator.of(context).pop(true);
+        }
+      } else if (mounted) {
+        setState(() {
+          _errorMessage = 'Ошибка входа. Проверьте email и пароль.';
+          _loading = false;
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = _authService.getErrorMessage(e);
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Неожиданная ошибка: $e';
+          _loading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -85,6 +123,23 @@ class _LoginPageState extends State<LoginPage> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          if (_errorMessage != null)
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade300),
+                              ),
+                              child: Text(
+                                _errorMessage!,
+                                style: TextStyle(
+                                  color: Colors.red.shade700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
                           TextFormField(
                             decoration: InputDecoration(
                               hintText: 'Email',
@@ -124,7 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                backgroundColor: const Color(0xFFFFA726), // vibrant orange
+                                //fixme
+                                backgroundColor: const Color(0xFFFFA726),
+                                foregroundColor: Colors.white,
                                 elevation: 4,
                               ),
                               onPressed: _loading ? null : _submit,
@@ -140,13 +197,9 @@ class _LoginPageState extends State<LoginPage> {
                           TextButton(
                             style: TextButton.styleFrom(foregroundColor: const Color(0xFF42A5F5)),
                             onPressed: () async {
-                              final registered = await Navigator.of(context)
+                              await Navigator.of(context)
                                   .push(MaterialPageRoute(builder: (_) => const RegisterPage()));
-                              if (registered == true) {
-                                if (!mounted) return;
-                                // After successful registration, log the user in immediately
-                                widget.onLogin();
-                              }
+                              // Firebase authStateChanges will handle the navigation automatically
                             },
                             child: const Text("Don't have an account? Register"),
                           ),

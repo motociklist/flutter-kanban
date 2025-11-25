@@ -4,12 +4,12 @@ import '../widgets/kanban_column.dart';
 import '../login_page.dart';
 import '../register_page.dart';
 import '../profile_page.dart';
+import '../services/firebase_auth_service.dart';
 
 class KanbanPage extends StatefulWidget {
-  final ValueNotifier<bool>? auth;
   final ValueNotifier<bool>? firstLaunch;
   final ValueNotifier<bool>? isDark;
-  const KanbanPage({Key? key, this.auth, this.firstLaunch, this.isDark})
+  const KanbanPage({Key? key, this.firstLaunch, this.isDark})
       : super(key: key);
 
   @override
@@ -19,6 +19,7 @@ class KanbanPage extends StatefulWidget {
 class _KanbanPageState extends State<KanbanPage> {
   String _id() => DateTime.now().microsecondsSinceEpoch.toString();
   late List<KanbanTask> _tasks;
+  final _authService = FirebaseAuthService();
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _KanbanPageState extends State<KanbanPage> {
           description: 'Login / Logout screens',
           status: KanbanStatus.inProgress,
           color: Colors.white,
-          createdAt: DateTime.now().subtract(Duration(days: 1))),
+          createdAt: DateTime.now().subtract(const Duration(days: 1))),
       KanbanTask(
           id: _id(),
           title: 'Write tests',
@@ -66,20 +67,20 @@ class _KanbanPageState extends State<KanbanPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('New task'),
+        title: const Text('New task'),
         content: Form(
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: const InputDecoration(labelText: 'Title'),
                 onSaved: (v) => title = v ?? '',
                 validator: (v) =>
                     (v == null || v.isEmpty) ? 'Enter title' : null,
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 onSaved: (v) => desc = v ?? '',
               ),
             ],
@@ -88,14 +89,14 @@ class _KanbanPageState extends State<KanbanPage> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text('Cancel')),
+              child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (!formKey.currentState!.validate()) return;
               formKey.currentState!.save();
               Navigator.pop(context, true);
             },
-            child: Text('Add'),
+            child: const Text('Add'),
           ),
         ],
       ),
@@ -115,11 +116,11 @@ class _KanbanPageState extends State<KanbanPage> {
   Color _colorForStatus(KanbanStatus status, BuildContext context) {
     switch (status) {
       case KanbanStatus.todo:
-        return Color(0xFFE3F2FD);
+        return const Color(0xFFE3F2FD);
       case KanbanStatus.inProgress:
-        return Color(0xFFFFF3E0);
+        return const Color(0xFFFFF3E0);
       case KanbanStatus.done:
-        return Color(0xFFE8F5E9);
+        return const Color(0xFFE8F5E9);
       default:
         return Theme.of(context).cardColor;
     }
@@ -127,71 +128,56 @@ class _KanbanPageState extends State<KanbanPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Wrap board in a scaffold that offers a bottom tab bar (tap bar)
-    return ValueListenableBuilder<bool?>(
-      valueListenable: widget.auth ?? ValueNotifier<bool?>(null),
-      builder: (context, authValue, _) {
-        // If this is the first launch and firstLaunch notifier present, open Register page once
-        if (widget.firstLaunch?.value == true) {
-          // schedule to run after build
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            widget.firstLaunch?.value = false;
-            await Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => RegisterPage()));
-          });
-        }
-
-        return _KanbanScaffold(
-          authValue: authValue ?? false,
-          onLoginRequested: () async {
-            final res = await Navigator.of(context).push<bool>(
-                MaterialPageRoute(
-                    builder: (_) =>
-                        LoginPage(onLogin: () => widget.auth?.value = true)));
-            if (res == true) widget.auth?.value = true;
-          },
-          onRegisterRequested: () async {
-            final res = await Navigator.of(context)
-                .push<bool>(MaterialPageRoute(builder: (_) => RegisterPage()));
-            if (res == true)
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Registration successful — please login')));
-          },
-          onLogout: () => widget.auth?.value = false,
-          addTask: _addTaskDialog,
-          buildBoard: () => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-            child: Row(
-              children: [
-                KanbanColumn(
-                    title: 'To Do',
-                    status: KanbanStatus.todo,
-                    tasks: _byStatus(KanbanStatus.todo),
-                    onTaskDropped: _moveTask),
-                KanbanColumn(
-                    title: 'In Progress',
-                    status: KanbanStatus.inProgress,
-                    tasks: _byStatus(KanbanStatus.inProgress),
-                    onTaskDropped: _moveTask),
-                KanbanColumn(
-                    title: 'Done',
-                    status: KanbanStatus.done,
-                    tasks: _byStatus(KanbanStatus.done),
-                    onTaskDropped: _moveTask),
-              ],
-            ),
-          ),
-          tasks: _tasks,
-          themeNotifier: widget.isDark,
-          colorForStatus: _colorForStatus,
-        );
+    return _KanbanScaffold(
+      onLoginRequested: () async {
+        await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+                builder: (_) =>
+                    LoginPage(onLogin: () {
+                      // Firebase handles login automatically
+                      // authStateChanges will trigger and refresh the UI
+                    })));
       },
+      onRegisterRequested: () async {
+        await Navigator.of(context)
+            .push<bool>(MaterialPageRoute(builder: (_) => const RegisterPage()));
+        // After registration, Firebase authStateChanges will automatically
+        // rebuild the app with the new user. No need to show message here.
+      },
+      onLogout: () {
+        _authService.signOut();
+      },
+      addTask: _addTaskDialog,
+      buildBoard: () => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+        child: Row(
+          children: [
+            KanbanColumn(
+                title: 'To Do',
+                status: KanbanStatus.todo,
+                tasks: _byStatus(KanbanStatus.todo),
+                onTaskDropped: _moveTask),
+            KanbanColumn(
+                title: 'In Progress',
+                status: KanbanStatus.inProgress,
+                tasks: _byStatus(KanbanStatus.inProgress),
+                onTaskDropped: _moveTask),
+            KanbanColumn(
+                title: 'Done',
+                status: KanbanStatus.done,
+                tasks: _byStatus(KanbanStatus.done),
+                onTaskDropped: _moveTask),
+          ],
+        ),
+      ),
+      tasks: _tasks,
+      themeNotifier: widget.isDark,
+      colorForStatus: _colorForStatus,
     );
   }
 }
 
 class _KanbanScaffold extends StatefulWidget {
-  final bool authValue;
   final VoidCallback onLogout;
   final Future<void> Function() onLoginRequested;
   final Future<void> Function() onRegisterRequested;
@@ -203,7 +189,6 @@ class _KanbanScaffold extends StatefulWidget {
 
   const _KanbanScaffold({
     Key? key,
-    required this.authValue,
     required this.onLogout,
     required this.onLoginRequested,
     required this.onRegisterRequested,
@@ -220,6 +205,7 @@ class _KanbanScaffold extends StatefulWidget {
 
 class _KanbanScaffoldState extends State<_KanbanScaffold> {
   int _selectedIndex = 0;
+  final _authService = FirebaseAuthService();
 
   void _onTap(int idx) async {
     // tabs mapping:
@@ -228,13 +214,15 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
     // 2 - Completed
     // 3 - Account
     if (idx == 3) {
-      if (widget.authValue) {
+      if (_authService.currentUser != null) {
         // Open full Profile page
-        await Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => ProfilePage(
-                onLogout: widget.onLogout,
-                tasks: widget.tasks,
-                themeNotifier: widget.themeNotifier)));
+        if (mounted) {
+          await Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => ProfilePage(
+                  onLogout: widget.onLogout,
+                  tasks: widget.tasks,
+                  themeNotifier: widget.themeNotifier)));
+        }
       } else {
         await widget.onLoginRequested();
       }
@@ -247,22 +235,23 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kanban', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Kanban', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 4,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient:
+            //fixme
                 LinearGradient(colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)]),
           ),
         ),
         actions: [
-          if (widget.authValue)
-            IconButton(icon: Icon(Icons.logout), onPressed: widget.onLogout),
+          if (_authService.currentUser != null)
+            IconButton(icon: const Icon(Icons.logout), onPressed: widget.onLogout),
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
               colors: [Color(0xFFF3F7FF), Color(0xFFE8F5FF)],
               begin: Alignment.topLeft,
@@ -291,7 +280,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                             decoration: BoxDecoration(
                                 color: widget.colorForStatus(t.status, context),
                                 borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
                                       color: Colors.black12, blurRadius: 4)
                                 ]),
@@ -299,11 +288,11 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(t.title,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   if (t.description != null)
                                     Text(t.description!,
-                                        style: TextStyle(color: Colors.black54))
+                                        style: const TextStyle(color: Colors.black54))
                                 ]),
                           ),
                         ))
@@ -323,7 +312,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                             decoration: BoxDecoration(
                                 color: widget.colorForStatus(t.status, context),
                                 borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
                                       color: Colors.black12, blurRadius: 4)
                                 ]),
@@ -331,11 +320,11 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(t.title,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600)),
                                   if (t.description != null)
                                     Text(t.description!,
-                                        style: TextStyle(color: Colors.black54))
+                                        style: const TextStyle(color: Colors.black54))
                                 ]),
                           ),
                         ))
@@ -351,31 +340,35 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                   Row(children: [
                     CircleAvatar(
                         radius: 28,
-                        backgroundColor: Color(0xFF7E57C2),
+                        backgroundColor: Color(0xFFFFA726),
                         child: Icon(Icons.person, color: Colors.white)),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Demo User',
-                              style: TextStyle(
+                          Text(_authService.currentUser?.displayName ?? 'Demo User',
+                              style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(widget.authValue ? 'Logged in' : 'Not logged in')
+                          Text(_authService.currentUser != null ? 'Logged in' : 'Not logged in')
                         ])
                   ]),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton.icon(
-                      onPressed: widget.authValue
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFA726),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: _authService.currentUser != null
                           ? widget.onLogout
                           : widget.onLoginRequested,
-                      icon: Icon(widget.authValue ? Icons.logout : Icons.login),
-                      label: Text(widget.authValue ? 'Logout' : 'Login')),
-                  SizedBox(height: 12),
-                  Text('About',
+                      icon: Icon(_authService.currentUser != null ? Icons.logout : Icons.login),
+                      label: Text(_authService.currentUser != null ? 'Logout' : 'Login')),
+                  const SizedBox(height: 12),
+                  const Text('About',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                       'This is a demo Kanban app with a vibrant UI. Use the Board tab to drag & drop tasks.'),
                 ],
               ),
@@ -386,10 +379,10 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onTap,
-        selectedItemColor: Color(0xFF6A1B9A),
+        selectedItemColor: const Color(0xFF6A1B9A),
         unselectedItemColor: Colors.black54,
         backgroundColor: Colors.white,
-        items: [
+        items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.view_kanban_outlined), label: 'Board'),
           BottomNavigationBarItem(
@@ -404,8 +397,8 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: widget.addTask,
-        backgroundColor: Color(0xFF7E57C2),
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFFFFA726),
+        child: const Icon(Icons.add),
       ),
     );
   }

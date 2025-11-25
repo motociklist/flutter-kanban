@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'styles.dart';
+import 'services/firebase_auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -10,26 +12,64 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _authService = FirebaseAuthService();
   String _email = '';
   String _password = '';
   String _confirm = '';
+  String _displayName = '';
   bool _loading = false;
+  String? _errorMessage;
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
     if (_password != _confirm) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Passwords do not match')));
+      setState(() {
+        _errorMessage = 'Пароли не совпадают';
+      });
       return;
     }
-    setState(() => _loading = true);
-    Future.delayed(Duration(milliseconds: 600), () {
-      setState(() => _loading = false);
-      // Use email in debug output so analyzer recognizes the field usage, then return success to caller
-      debugPrint('Registered user: $_email');
-      Navigator.of(context).pop(true);
+
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
     });
+
+    try {
+      final result = await _authService.registerWithEmailAndPassword(
+        email: _email,
+        password: _password,
+        displayName: _displayName,
+      );
+
+      if (result != null && mounted) {
+        debugPrint('Registered user: ${_email}');
+        // Успешная регистрация - закрыть страницу регистрации
+        // Firebase authStateChanges автоматически обновит состояние
+        if (mounted) {
+          Navigator.of(context).pop(true);
+        }
+      } else if (mounted) {
+        setState(() {
+          _errorMessage = 'Ошибка регистрации. Попробуйте снова.';
+          _loading = false;
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = _authService.getErrorMessage(e);
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Неожиданная ошибка: $e';
+          _loading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -78,6 +118,32 @@ class _RegisterPageState extends State<RegisterPage> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          if (_errorMessage != null)
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade300),
+                              ),
+                              child: Text(
+                                _errorMessage!,
+                                style: TextStyle(
+                                  color: Colors.red.shade700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          TextFormField(
+                            decoration: AppStyles.inputDecoration(
+                                hint: 'Full Name',
+                                prefixIcon: Icons.person_outline),
+                            onSaved: (v) => _displayName = v ?? '',
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? 'Enter your name' : null,
+                          ),
+                          const SizedBox(height: 12),
                           TextFormField(
                             decoration: AppStyles.inputDecoration(
                                 hint: 'Email',
@@ -116,7 +182,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                backgroundColor: const Color(0xFFFFA726), // blue register
+                                //fixme
+                                backgroundColor: const Color(0xFFFFA726),
+                                foregroundColor: Colors.white,
                                 elevation: 4,
                               ),
                               onPressed: _loading ? null : _submit,
@@ -125,7 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                  : const Text('Register', style: TextStyle(fontSize: 16)),
+                                  : const Text('Register', style: TextStyle(fontSize: 16, color: Colors.white)),
                             ),
                           ),
                         ],

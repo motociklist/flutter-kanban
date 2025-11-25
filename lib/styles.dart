@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppStyles {
   // Core brand colors (used in light mode)
+  //fixme
   static const Color primary = Color(0xFF6A1B9A); // deep violet
   static const Color secondary = Color(0xFF1976D2); // bright blue
 
@@ -36,7 +37,8 @@ class AppStyles {
       ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: verticalPadding),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: primary,
+        backgroundColor: const Color(0xFFFFA726),
+        foregroundColor: Colors.white,
         elevation: 4,
       );
 
