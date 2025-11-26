@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'register_page.dart';
-import 'services/firebase_auth_service.dart';
+import '../styles/styles.dart';
+import '../services/firebase_auth_service.dart';
 
-class LoginPage extends StatefulWidget {
-  final VoidCallback onLogin;
-  const LoginPage({Key? key, required this.onLogin}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _authService = FirebaseAuthService();
   String _email = '';
   String _password = '';
+  String _confirm = '';
+  String _displayName = '';
   bool _loading = false;
   String? _errorMessage;
 
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
+    if (_password != _confirm) {
+      setState(() {
+        _errorMessage = 'Пароли не совпадают';
+      });
+      return;
+    }
 
     setState(() {
       _loading = true;
@@ -29,23 +36,20 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final result = await _authService.signInWithEmailAndPassword(
+      final result = await _authService.registerWithEmailAndPassword(
         email: _email,
         password: _password,
+        displayName: _displayName,
       );
 
       if (result != null && mounted) {
-        debugPrint('Login successful: ${_email}');
-        // Вход успешен - Firebase authStateChanges обновит состояние автоматически
-        // Небольшая задержка для обновления authStateChanges
-        await Future.delayed(const Duration(milliseconds: 500));
-        // Закрыть страницу входа
+        debugPrint('Registered user: ${_email}');
         if (mounted) {
           Navigator.of(context).pop(true);
         }
       } else if (mounted) {
         setState(() {
-          _errorMessage = 'Ошибка входа. Проверьте email и пароль.';
+          _errorMessage = 'Ошибка регистрации. Попробуйте снова.';
           _loading = false;
         });
       }
@@ -68,28 +72,19 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none);
-
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => true,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight),
-          ),
+          decoration: const BoxDecoration(gradient: AppStyles.backgroundGradient),
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo / header
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -97,10 +92,9 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       children: const [
-                        Icon(Icons.dashboard_customize,
-                            size: 64, color: Colors.white),
+                        Icon(Icons.person_add, size: 64, color: Colors.white),
                         SizedBox(height: 8),
-                        Text('Welcome to Kanban+',
+                        Text('Create account',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -109,8 +103,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Card container
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -141,36 +133,32 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Email',
-                              prefixIcon: const Icon(Icons.email_outlined),
-                              filled: true,
-                              fillColor: Colors.grey.shade100,
-                              border: border,
-                              enabledBorder: border,
-                              focusedBorder: border,
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            onSaved: (v) => _email = v ?? '',
+                            decoration: AppStyles.inputDecoration(
+                                hint: 'Full Name', prefixIcon: Icons.person_outline),
+                            onSaved: (v) => _displayName = v ?? '',
                             validator: (v) =>
-                                (v == null || v.isEmpty) ? 'Enter email' : null,
+                                (v == null || v.isEmpty) ? 'Enter your name' : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Password',
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              filled: true,
-                              fillColor: Colors.grey.shade100,
-                              border: border,
-                              enabledBorder: border,
-                              focusedBorder: border,
-                            ),
+                            decoration: AppStyles.inputDecoration(hint: 'Email', prefixIcon: Icons.email_outlined),
+                            keyboardType: TextInputType.emailAddress,
+                            onSaved: (v) => _email = v ?? '',
+                            validator: (v) => (v == null || v.isEmpty) ? 'Enter email' : null,
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            decoration: AppStyles.inputDecoration(hint: 'Password', prefixIcon: Icons.lock_outline),
                             obscureText: true,
                             onSaved: (v) => _password = v ?? '',
-                            validator: (v) => (v == null || v.length < 4)
-                                ? 'Password too short'
-                                : null,
+                            validator: (v) => (v == null || v.length < 4) ? 'Password too short' : null,
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            decoration: AppStyles.inputDecoration(hint: 'Confirm Password', prefixIcon: Icons.lock_outline),
+                            obscureText: true,
+                            onSaved: (v) => _confirm = v ?? '',
+                            validator: (v) => (v == null || v.length < 4) ? 'Confirm password' : null,
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
@@ -179,7 +167,6 @@ class _LoginPageState extends State<LoginPage> {
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                //fixme
                                 backgroundColor: const Color(0xFFFFA726),
                                 foregroundColor: Colors.white,
                                 elevation: 4,
@@ -190,18 +177,8 @@ class _LoginPageState extends State<LoginPage> {
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                  : const Text('Login', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                  : const Text('Register', style: TextStyle(fontSize: 16, color: Colors.white)),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          TextButton(
-                            style: TextButton.styleFrom(foregroundColor: const Color(0xFF42A5F5)),
-                            onPressed: () async {
-                              await Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (_) => const RegisterPage()));
-                              // Firebase authStateChanges will handle the navigation automatically
-                            },
-                            child: const Text("Don't have an account? Register"),
                           ),
                         ],
                       ),
