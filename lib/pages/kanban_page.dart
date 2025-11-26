@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/kanban_task.dart';
 import '../widgets/kanban_column.dart';
-import '../login_page.dart';
-import '../register_page.dart';
-import '../profile_page.dart';
+import 'login_page.dart';
+import 'register_page.dart';
+import 'profile_page.dart';
 import '../services/firebase_auth_service.dart';
 
 class KanbanPage extends StatefulWidget {

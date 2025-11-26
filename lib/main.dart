@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'pages/kanban_page.dart';
-import 'login_page.dart';
-import 'styles.dart';
+import 'pages/login_page.dart';
+import 'styles/styles.dart';
 import 'services/firebase_auth_service.dart';
 
 void main() async {

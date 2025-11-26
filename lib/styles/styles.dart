@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class AppStyles {
   // Core brand colors (used in light mode)
-  //fixme
   static const Color primary = Color(0xFF6A1B9A); // deep violet
   static const Color secondary = Color(0xFF1976D2); // bright blue
 
@@ -21,8 +20,7 @@ class AppStyles {
     borderSide: BorderSide.none,
   );
 
-  static InputDecoration inputDecoration(
-          {required String hint, IconData? prefixIcon}) =>
+  static InputDecoration inputDecoration({required String hint, IconData? prefixIcon}) =>
       InputDecoration(
         hintText: hint,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
@@ -45,29 +43,22 @@ class AppStyles {
   // Light theme
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-        seedColor: primary, primary: primary, secondary: secondary),
+    colorScheme: ColorScheme.fromSeed(seedColor: primary, primary: primary, secondary: secondary),
     primaryColor: primary,
     scaffoldBackgroundColor: const Color(0xFFF7FAFF),
     appBarTheme: const AppBarTheme(backgroundColor: primary),
     elevatedButtonTheme: ElevatedButtonThemeData(style: elevatedButtonStyle()),
-    inputDecorationTheme: InputDecorationTheme(
-        border: inputBorder, filled: true, fillColor: Colors.grey.shade100),
+    inputDecorationTheme: InputDecorationTheme(border: inputBorder, filled: true, fillColor: Colors.grey.shade100),
   );
 
   // Dark theme
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryDark,
-        primary: primaryDark,
-        secondary: secondaryDark,
-        brightness: Brightness.dark),
+    colorScheme: ColorScheme.fromSeed(seedColor: primaryDark, primary: primaryDark, secondary: secondaryDark, brightness: Brightness.dark),
     primaryColor: primaryDark,
     scaffoldBackgroundColor: const Color(0xFF0B1020),
     appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1E1B2F)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: elevatedButtonStyle()),
-    inputDecorationTheme: InputDecorationTheme(
-        border: inputBorder, filled: true, fillColor: Colors.grey.shade800),
+    inputDecorationTheme: InputDecorationTheme(border: inputBorder, filled: true, fillColor: Colors.grey.shade800),
   );
 }
