@@ -119,12 +119,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         Row(children: [
                           ElevatedButton(onPressed: _editProfile, style: AppStyles.elevatedButtonStyle(verticalPadding: 10), child: const Text('Edit Profile')),
                           const SizedBox(width: 8),
-                          OutlinedButton(onPressed: () {
-                            if (widget.onLogout != null) {
-                              widget.onLogout!();
-                              Navigator.pop(context);
-                            }
-                          }, child: const Text('Logout')),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (widget.onLogout != null) {
+                                widget.onLogout!();
+                                Navigator.pop(context);
+                              }
+                            },
+                            style: AppStyles.elevatedButtonStyle(verticalPadding: 10),
+                            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+                          ),
                         ])
                       ]),
                     )
