@@ -28,7 +28,7 @@ class DemoApp extends StatelessWidget {
     final ValueNotifier<bool> firstLaunch = ValueNotifier<bool>(true);
     // theme notifier: false = light, true = dark
     final ValueNotifier<bool> darkMode = ValueNotifier<bool>(false);
-    final _authService = FirebaseAuthService();
+    final authService = FirebaseAuthService();
 
     return ValueListenableBuilder<bool>(
       valueListenable: darkMode,
@@ -39,7 +39,7 @@ class DemoApp extends StatelessWidget {
           darkTheme: AppStyles.darkTheme,
           themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
           home: StreamBuilder(
-            stream: _authService.authStateChanges,
+            stream: authService.authStateChanges,
             builder: (context, snapshot) {
               // Loading state
               if (snapshot.connectionState == ConnectionState.waiting) {

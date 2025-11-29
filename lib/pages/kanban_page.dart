@@ -9,11 +9,10 @@ import '../services/firebase_auth_service.dart';
 class KanbanPage extends StatefulWidget {
   final ValueNotifier<bool>? firstLaunch;
   final ValueNotifier<bool>? isDark;
-  const KanbanPage({Key? key, this.firstLaunch, this.isDark})
-      : super(key: key);
+  const KanbanPage({Key? key, this.firstLaunch, this.isDark}) : super(key: key);
 
   @override
-  _KanbanPageState createState() => _KanbanPageState();
+  State<KanbanPage> createState() => _KanbanPageState();
 }
 
 class _KanbanPageState extends State<KanbanPage> {
@@ -130,17 +129,15 @@ class _KanbanPageState extends State<KanbanPage> {
   Widget build(BuildContext context) {
     return _KanbanScaffold(
       onLoginRequested: () async {
-        await Navigator.of(context).push<bool>(
-            MaterialPageRoute(
-                builder: (_) =>
-                    LoginPage(onLogin: () {
-                      // Firebase handles login automatically
-                      // authStateChanges will trigger and refresh the UI
-                    })));
+        await Navigator.of(context).push<bool>(MaterialPageRoute(
+            builder: (_) => LoginPage(onLogin: () {
+                  // Firebase handles login automatically
+                  // authStateChanges will trigger and refresh the UI
+                })));
       },
       onRegisterRequested: () async {
-        await Navigator.of(context)
-            .push<bool>(MaterialPageRoute(builder: (_) => const RegisterPage()));
+        await Navigator.of(context).push<bool>(
+            MaterialPageRoute(builder: (_) => const RegisterPage()));
         // After registration, Firebase authStateChanges will automatically
         // rebuild the app with the new user. No need to show message here.
       },
@@ -235,19 +232,21 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kanban', style: TextStyle(fontWeight: FontWeight.bold)),
+        title:
+            const Text('Kanban', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 4,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient:
-            //fixme
+                //fixme
                 LinearGradient(colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)]),
           ),
         ),
         actions: [
           if (_authService.currentUser != null)
-            IconButton(icon: const Icon(Icons.logout), onPressed: widget.onLogout),
+            IconButton(
+                icon: const Icon(Icons.logout), onPressed: widget.onLogout),
         ],
       ),
       body: Container(
@@ -292,7 +291,8 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                                           fontWeight: FontWeight.w600)),
                                   if (t.description != null)
                                     Text(t.description!,
-                                        style: const TextStyle(color: Colors.black54))
+                                        style: const TextStyle(
+                                            color: Colors.black54))
                                 ]),
                           ),
                         ))
@@ -324,7 +324,8 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                                           fontWeight: FontWeight.w600)),
                                   if (t.description != null)
                                     Text(t.description!,
-                                        style: const TextStyle(color: Colors.black54))
+                                        style: const TextStyle(
+                                            color: Colors.black54))
                                 ]),
                           ),
                         ))
@@ -338,7 +339,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                         radius: 28,
                         backgroundColor: Color(0xFFFFA726),
                         child: Icon(Icons.person, color: Colors.white)),
@@ -346,10 +347,14 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                     Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_authService.currentUser?.displayName ?? 'Demo User',
+                          Text(
+                              _authService.currentUser?.displayName ??
+                                  'Demo User',
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_authService.currentUser != null ? 'Logged in' : 'Not logged in')
+                          Text(_authService.currentUser != null
+                              ? 'Logged in'
+                              : 'Not logged in')
                         ])
                   ]),
                   const SizedBox(height: 20),
@@ -361,8 +366,12 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                       onPressed: _authService.currentUser != null
                           ? widget.onLogout
                           : widget.onLoginRequested,
-                      icon: Icon(_authService.currentUser != null ? Icons.logout : Icons.login),
-                      label: Text(_authService.currentUser != null ? 'Logout' : 'Login')),
+                      icon: Icon(_authService.currentUser != null
+                          ? Icons.logout
+                          : Icons.login),
+                      label: Text(_authService.currentUser != null
+                          ? 'Logout'
+                          : 'Login')),
                   const SizedBox(height: 12),
                   const Text('About',
                       style:

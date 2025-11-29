@@ -11,7 +11,7 @@ class ProfilePage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
@@ -54,9 +54,14 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel')),
             ElevatedButton(
-              onPressed: () => Navigator.pop(context, {'name': nameCtrl.text.trim(), 'email': emailCtrl.text.trim()}),
+              onPressed: () => Navigator.pop(context, {
+                'name': nameCtrl.text.trim(),
+                'email': emailCtrl.text.trim()
+              }),
               child: const Text('Save'),
             ),
           ],
@@ -87,10 +92,14 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text('Profile'),
         elevation: 0,
-        flexibleSpace: Container(decoration: const BoxDecoration(gradient: AppStyles.backgroundGradient)),
+        flexibleSpace: Container(
+            decoration:
+                const BoxDecoration(gradient: AppStyles.backgroundGradient)),
       ),
       body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFFF7FAFF), Color(0xFFF0F4FF)])),
+        decoration: const BoxDecoration(
+            gradient:
+                LinearGradient(colors: [Color(0xFFF7FAFF), Color(0xFFF0F4FF)])),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -101,60 +110,103 @@ class _ProfilePageState extends State<ProfilePage> {
                 decoration: BoxDecoration(
                   gradient: AppStyles.backgroundGradient,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black12, blurRadius: 8)
+                  ],
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
                         radius: 36,
-                        backgroundColor: const Color.fromRGBO(255, 255, 255, 0.18),
-                        child: Text(_name.isNotEmpty ? _name[0] : 'U', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold))),
+                        backgroundColor:
+                            const Color.fromRGBO(255, 255, 255, 0.18),
+                        child: Text(_name.isNotEmpty ? _name[0] : 'U',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold))),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(_name, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 6),
-                        Text(_email, style: const TextStyle(color: Colors.white70)),
-                        const SizedBox(height: 10),
-                        Row(children: [
-                          ElevatedButton(onPressed: _editProfile, style: AppStyles.elevatedButtonStyle(verticalPadding: 10), child: const Text('Edit Profile')),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (widget.onLogout != null) {
-                                widget.onLogout!();
-                                Navigator.pop(context);
-                              }
-                            },
-                            style: AppStyles.elevatedButtonStyle(verticalPadding: 10),
-                            child: const Text('Logout', style: TextStyle(color: Colors.white)),
-                          ),
-                        ])
-                      ]),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_name,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            Text(_email,
+                                style: const TextStyle(color: Colors.white70)),
+                            const SizedBox(height: 10),
+                            Row(children: [
+                              ElevatedButton(
+                                  onPressed: _editProfile,
+                                  style: AppStyles.elevatedButtonStyle(
+                                      verticalPadding: 10),
+                                  child: const Text('Edit Profile')),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (widget.onLogout != null) {
+                                    widget.onLogout!();
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                style: AppStyles.elevatedButtonStyle(
+                                    verticalPadding: 10),
+                                child: const Text('Logout',
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            ])
+                          ]),
                     )
                   ],
                 ),
               ),
               const SizedBox(height: 16),
-
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)]),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('Your stats', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 12),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    _StatTile(label: 'To Do', value: todo.toString(), color: const Color(0xFFE3F2FD)),
-                    _StatTile(label: 'In Progress', value: inProgress.toString(), color: const Color(0xFFFFF3E0)),
-                    _StatTile(label: 'Done', value: done.toString(), color: const Color(0xFFE8F5E9)),
-                  ])
-                ]),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 6)
+                    ]),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Your stats',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 12),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _StatTile(
+                                label: 'To Do',
+                                value: todo.toString(),
+                                color: const Color(0xFFE3F2FD)),
+                            _StatTile(
+                                label: 'In Progress',
+                                value: inProgress.toString(),
+                                color: const Color(0xFFFFF3E0)),
+                            _StatTile(
+                                label: 'Done',
+                                value: done.toString(),
+                                color: const Color(0xFFE8F5E9)),
+                          ])
+                    ]),
               ),
               const SizedBox(height: 16),
-
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)]),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 6)
+                    ]),
                 child: Column(children: [
                   widget.themeNotifier != null
                       ? ValueListenableBuilder<bool>(
@@ -164,20 +216,34 @@ class _ProfilePageState extends State<ProfilePage> {
                               leading: const Icon(Icons.palette),
                               title: const Text('Theme'),
                               subtitle: Text(isDark ? 'Dark' : 'Light'),
-                              trailing: Switch(value: isDark, onChanged: (v) => widget.themeNotifier?.value = v),
+                              trailing: Switch(
+                                  value: isDark,
+                                  onChanged: (v) =>
+                                      widget.themeNotifier?.value = v),
                             );
                           },
                         )
-                      : ListTile(leading: const Icon(Icons.palette), title: const Text('Theme'), subtitle: const Text('Light / Dark (placeholder)'), onTap: () {}),
+                      : ListTile(
+                          leading: const Icon(Icons.palette),
+                          title: const Text('Theme'),
+                          subtitle: const Text('Light / Dark (placeholder)'),
+                          onTap: () {}),
                   const Divider(),
-                  ListTile(leading: const Icon(Icons.lock), title: const Text('Change password'), onTap: () {}),
+                  ListTile(
+                      leading: const Icon(Icons.lock),
+                      title: const Text('Change password'),
+                      onTap: () {}),
                   const Divider(),
-                  ListTile(leading: const Icon(Icons.help_outline), title: const Text('Help & feedback'), onTap: () {}),
+                  ListTile(
+                      leading: const Icon(Icons.help_outline),
+                      title: const Text('Help & feedback'),
+                      onTap: () {}),
                 ]),
               ),
               const SizedBox(height: 24),
-
-              Center(child: Text('Made with ❤️ — Kanban+', style: TextStyle(color: Colors.grey[600]))),
+              Center(
+                  child: Text('Made with ❤️ — Kanban+',
+                      style: TextStyle(color: Colors.grey[600]))),
             ],
           ),
         ),
@@ -190,7 +256,9 @@ class _StatTile extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _StatTile({Key? key, required this.label, required this.value, required this.color}) : super(key: key);
+  const _StatTile(
+      {Key? key, required this.label, required this.value, required this.color})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -198,9 +266,12 @@ class _StatTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         margin: const EdgeInsets.symmetric(horizontal: 6),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(
+            color: color, borderRadius: BorderRadius.circular(10)),
         child: Column(children: [
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(label, style: const TextStyle(color: Colors.black54))
         ]),

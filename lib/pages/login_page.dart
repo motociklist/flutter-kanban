@@ -8,7 +8,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({Key? key, required this.onLogin}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (result != null && mounted) {
-        debugPrint('Login successful: ${_email}');
+        debugPrint('Login successful: $_email');
         // Небольшая задержка для обновления authStateChanges
         await Future.delayed(const Duration(milliseconds: 500));
         if (mounted) {
@@ -92,8 +92,8 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: BoxDecoration(
                         color: Colors.white.withAlpha(31),
                         borderRadius: BorderRadius.circular(16)),
-                    child: Column(
-                      children: const [
+                    child: const Column(
+                      children: [
                         Icon(Icons.dashboard_customize,
                             size: 64, color: Colors.white),
                         SizedBox(height: 8),
@@ -106,7 +106,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -173,8 +172,10 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                                 backgroundColor: const Color(0xFFFFA726),
                                 foregroundColor: Colors.white,
                                 elevation: 4,
@@ -184,18 +185,24 @@ class _LoginPageState extends State<LoginPage> {
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                  : const Text('Login', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2))
+                                  : const Text('Login',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white)),
                             ),
                           ),
                           const SizedBox(height: 12),
                           TextButton(
-                            style: TextButton.styleFrom(foregroundColor: const Color(0xFF42A5F5)),
+                            style: TextButton.styleFrom(
+                                foregroundColor: const Color(0xFF42A5F5)),
                             onPressed: () async {
-                              await Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (_) => const RegisterPage()));
+                              await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (_) => const RegisterPage()));
                             },
-                            child: const Text("Don't have an account? Register"),
+                            child:
+                                const Text("Don't have an account? Register"),
                           ),
                         ],
                       ),

@@ -23,7 +23,7 @@ class KanbanCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: isDragging ? [BoxShadow(color: Colors.black26, blurRadius: 8)] : [BoxShadow(color: Colors.black12, blurRadius: 4)],
+          boxShadow: isDragging ? [const BoxShadow(color: Colors.black26, blurRadius: 8)] : [const BoxShadow(color: Colors.black12, blurRadius: 4)],
         ),
         padding: const EdgeInsets.all(12),
         child: Column(

@@ -7,7 +7,7 @@ class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -43,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (result != null && mounted) {
-        debugPrint('Registered user: ${_email}');
+        debugPrint('Registered user: $_email');
         if (mounted) {
           Navigator.of(context).pop(true);
         }
@@ -78,7 +78,8 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
-          decoration: const BoxDecoration(gradient: AppStyles.backgroundGradient),
+          decoration:
+              const BoxDecoration(gradient: AppStyles.backgroundGradient),
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
@@ -90,8 +91,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     decoration: BoxDecoration(
                         color: Colors.white.withAlpha(31),
                         borderRadius: BorderRadius.circular(16)),
-                    child: Column(
-                      children: const [
+                    child: const Column(
+                      children: [
                         Icon(Icons.person_add, size: 64, color: Colors.white),
                         SizedBox(height: 8),
                         Text('Create account',
@@ -134,39 +135,54 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           TextFormField(
                             decoration: AppStyles.inputDecoration(
-                                hint: 'Full Name', prefixIcon: Icons.person_outline),
+                                hint: 'Full Name',
+                                prefixIcon: Icons.person_outline),
                             onSaved: (v) => _displayName = v ?? '',
-                            validator: (v) =>
-                                (v == null || v.isEmpty) ? 'Enter your name' : null,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? 'Enter your name'
+                                : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            decoration: AppStyles.inputDecoration(hint: 'Email', prefixIcon: Icons.email_outlined),
+                            decoration: AppStyles.inputDecoration(
+                                hint: 'Email',
+                                prefixIcon: Icons.email_outlined),
                             keyboardType: TextInputType.emailAddress,
                             onSaved: (v) => _email = v ?? '',
-                            validator: (v) => (v == null || v.isEmpty) ? 'Enter email' : null,
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? 'Enter email' : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            decoration: AppStyles.inputDecoration(hint: 'Password', prefixIcon: Icons.lock_outline),
+                            decoration: AppStyles.inputDecoration(
+                                hint: 'Password',
+                                prefixIcon: Icons.lock_outline),
                             obscureText: true,
                             onSaved: (v) => _password = v ?? '',
-                            validator: (v) => (v == null || v.length < 4) ? 'Password too short' : null,
+                            validator: (v) => (v == null || v.length < 4)
+                                ? 'Password too short'
+                                : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
-                            decoration: AppStyles.inputDecoration(hint: 'Confirm Password', prefixIcon: Icons.lock_outline),
+                            decoration: AppStyles.inputDecoration(
+                                hint: 'Confirm Password',
+                                prefixIcon: Icons.lock_outline),
                             obscureText: true,
                             onSaved: (v) => _confirm = v ?? '',
-                            validator: (v) => (v == null || v.length < 4) ? 'Confirm password' : null,
+                            validator: (v) => (v == null || v.length < 4)
+                                ? 'Confirm password'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                                 backgroundColor: const Color(0xFFFFA726),
                                 foregroundColor: Colors.white,
                                 elevation: 4,
@@ -176,8 +192,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                  : const Text('Register', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2))
+                                  : const Text('Register',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white)),
                             ),
                           ),
                         ],
