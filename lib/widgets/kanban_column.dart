@@ -3,12 +3,14 @@ import '../models/kanban_task.dart';
 import 'kanban_card.dart';
 
 typedef OnTaskDropped = void Function(KanbanTask task, KanbanStatus toStatus);
+typedef OnTaskTap = Future<void> Function(KanbanTask task);
 
 class KanbanColumn extends StatelessWidget {
   final String title;
   final KanbanStatus status;
   final List<KanbanTask> tasks;
   final OnTaskDropped onTaskDropped;
+  final OnTaskTap? onTaskTap;
 
   const KanbanColumn({
     Key? key,
@@ -16,6 +18,7 @@ class KanbanColumn extends StatelessWidget {
     required this.status,
     required this.tasks,
     required this.onTaskDropped,
+    this.onTaskTap,
   }) : super(key: key);
 
   @override
@@ -28,7 +31,8 @@ class KanbanColumn extends StatelessWidget {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+            BoxShadow(
+                color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
           ],
         ),
         child: Column(
@@ -36,7 +40,9 @@ class KanbanColumn extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(title,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
                 const Spacer(),
                 CircleAvatar(radius: 12, child: Text('${tasks.length}')),
               ],
@@ -44,25 +50,41 @@ class KanbanColumn extends StatelessWidget {
             const SizedBox(height: 8),
             Expanded(
               child: DragTarget<KanbanTask>(
-                onWillAcceptWithDetails: (details) => details.data.status != status,
-                onAcceptWithDetails: (details) => onTaskDropped(details.data, status),
+                onWillAcceptWithDetails: (details) =>
+                    details.data.status != status,
+                onAcceptWithDetails: (details) =>
+                    onTaskDropped(details.data, status),
                 builder: (context, candidateData, rejectedData) {
                   return SingleChildScrollView(
                     child: Column(
                       children: tasks
                           .map((t) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 6.0),
-                                child: LongPressDraggable<KanbanTask>(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6.0),
+                                child: Draggable<KanbanTask>(
                                   data: t,
                                   feedback: Material(
                                     color: Colors.transparent,
                                     child: ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 260),
-                                      child: KanbanCard(task: t, isDragging: true, colorForStatus: _colorForStatus),
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 260),
+                                      child: KanbanCard(
+                                          task: t,
+                                          isDragging: true,
+                                          colorForStatus: _colorForStatus),
                                     ),
                                   ),
-                                  childWhenDragging: Opacity(opacity: 0.4, child: KanbanCard(task: t, colorForStatus: _colorForStatus)),
-                                  child: KanbanCard(task: t, colorForStatus: _colorForStatus),
+                                  childWhenDragging: Opacity(
+                                      opacity: 0.4,
+                                      child: KanbanCard(
+                                          task: t,
+                                          colorForStatus: _colorForStatus)),
+                                  child: KanbanCard(
+                                      task: t,
+                                      colorForStatus: _colorForStatus,
+                                      onTap: (task) =>
+                                          onTaskTap?.call(task) ??
+                                          Future.value()),
                                 ),
                               ))
                           .toList(),
@@ -76,8 +98,6 @@ class KanbanColumn extends StatelessWidget {
       ),
     );
   }
-
-  
 
   Color _colorForStatus(KanbanStatus status, BuildContext context) {
     switch (status) {

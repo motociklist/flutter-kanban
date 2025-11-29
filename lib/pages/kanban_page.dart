@@ -5,6 +5,8 @@ import 'login_page.dart';
 import 'register_page.dart';
 import 'profile_page.dart';
 import '../services/firebase_auth_service.dart';
+import '../services/firestore_task_service.dart';
+import 'dart:async';
 
 class KanbanPage extends StatefulWidget {
   final ValueNotifier<bool>? firstLaunch;
@@ -19,6 +21,8 @@ class _KanbanPageState extends State<KanbanPage> {
   String _id() => DateTime.now().microsecondsSinceEpoch.toString();
   late List<KanbanTask> _tasks;
   final _authService = FirebaseAuthService();
+  final _taskService = FirestoreTaskService();
+  StreamSubscription<List<KanbanTask>>? _tasksSub;
 
   @override
   void initState() {
@@ -46,6 +50,71 @@ class _KanbanPageState extends State<KanbanPage> {
           color: Colors.white,
           createdAt: DateTime.now()),
     ];
+
+    // Subscribe to auth state changes to attach/detach Firestore listeners
+    _authService.authStateChanges.listen((user) {
+      if (user != null) {
+        _subscribeToTasks();
+      } else {
+        // fallback to demo tasks on logout
+        _unsubscribeFromTasks();
+        setState(() {
+          _tasks = [
+            KanbanTask(
+                id: _id(),
+                title: 'Design app shell',
+                description: 'Create basic routes and appbar',
+                status: KanbanStatus.todo,
+                color: Colors.white,
+                createdAt: DateTime.now()),
+            KanbanTask(
+                id: _id(),
+                title: 'Auth flow',
+                description: 'Login / Logout screens',
+                status: KanbanStatus.inProgress,
+                color: Colors.white,
+                createdAt: DateTime.now().subtract(const Duration(days: 1))),
+            KanbanTask(
+                id: _id(),
+                title: 'Write tests',
+                description: 'Add basic widget tests',
+                status: KanbanStatus.done,
+                color: Colors.white,
+                createdAt: DateTime.now()),
+          ];
+        });
+      }
+    });
+
+    // if user already logged in, subscribe immediately
+    if (_authService.currentUser != null) {
+      _subscribeToTasks();
+    }
+  }
+
+  @override
+  void dispose() {
+    _unsubscribeFromTasks();
+    super.dispose();
+  }
+
+  void _subscribeToTasks() {
+    // subscribe to Firestore tasks as stream
+    _tasksSub?.cancel();
+    try {
+      _tasksSub = _taskService.tasksStream().listen((tasks) {
+        setState(() {
+          _tasks = tasks;
+        });
+      });
+    } catch (e) {
+      debugPrint('Error subscribing to tasks stream: $e');
+    }
+  }
+
+  void _unsubscribeFromTasks() {
+    _tasksSub?.cancel();
+    _tasksSub = null;
   }
 
   List<KanbanTask> _byStatus(KanbanStatus s) =>
@@ -56,6 +125,21 @@ class _KanbanPageState extends State<KanbanPage> {
       final idx = _tasks.indexWhere((t) => t.id == task.id);
       if (idx != -1) _tasks[idx].status = to;
     });
+    if (_authService.currentUser != null) {
+      // update on the backend
+      try {
+        final updated = KanbanTask(
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            status: to,
+            color: task.color,
+            createdAt: task.createdAt);
+        _taskService.updateTask(updated);
+      } catch (e) {
+        debugPrint('Error updating task status: $e');
+      }
+    }
   }
 
   Future<void> _addTaskDialog() async {
@@ -102,13 +186,113 @@ class _KanbanPageState extends State<KanbanPage> {
     );
 
     if (ok == true) {
-      setState(() {
-        _tasks.add(KanbanTask(
-            id: _id(),
-            title: title,
-            description: desc,
-            status: KanbanStatus.todo));
-      });
+      final newTask = KanbanTask(
+          id: _id(),
+          title: title,
+          description: desc,
+          status: KanbanStatus.todo);
+      if (_authService.currentUser != null) {
+        try {
+          await _taskService.addTask(newTask);
+        } catch (e) {
+          debugPrint('Failed adding task to Firestore: $e');
+          // fallback to local
+          setState(() => _tasks.add(newTask));
+        }
+      } else {
+        setState(() => _tasks.add(newTask));
+      }
+    }
+  }
+
+  Future<void> _editTaskDialog(KanbanTask task) async {
+    final formKey = GlobalKey<FormState>();
+    String title = task.title;
+    String desc = task.description ?? '';
+
+    final ok = await showDialog<String?>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit task'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                initialValue: title,
+                decoration: const InputDecoration(labelText: 'Title'),
+                onSaved: (v) => title = v ?? '',
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Enter title' : null,
+              ),
+              TextFormField(
+                initialValue: desc,
+                decoration: const InputDecoration(labelText: 'Description'),
+                onSaved: (v) => desc = v ?? '',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () async {
+                // delete
+                Navigator.pop(context, 'delete');
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red))),
+          ElevatedButton(
+            onPressed: () {
+              if (!formKey.currentState!.validate()) return;
+              formKey.currentState!.save();
+              Navigator.pop(context, 'save');
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (ok == 'delete') {
+      if (_authService.currentUser != null) {
+        try {
+          await _taskService.deleteTask(task.id);
+        } catch (e) {
+          debugPrint('Failed to delete task from Firestore: $e');
+        }
+      } else {
+        setState(() => _tasks.removeWhere((t) => t.id == task.id));
+      }
+      return;
+    }
+
+    if (ok == 'save') {
+      final updated = KanbanTask(
+          id: task.id,
+          title: title,
+          description: desc,
+          status: task.status,
+          color: task.color,
+          createdAt: task.createdAt);
+      if (_authService.currentUser != null) {
+        try {
+          await _taskService.updateTask(updated);
+        } catch (e) {
+          debugPrint('Failed to update task in Firestore: $e');
+          setState(() {
+            final idx = _tasks.indexWhere((t) => t.id == updated.id);
+            if (idx != -1) _tasks[idx] = updated;
+          });
+        }
+      } else {
+        setState(() {
+          final idx = _tasks.indexWhere((t) => t.id == updated.id);
+          if (idx != -1) _tasks[idx] = updated;
+        });
+      }
     }
   }
 
@@ -153,17 +337,20 @@ class _KanbanPageState extends State<KanbanPage> {
                 title: 'To Do',
                 status: KanbanStatus.todo,
                 tasks: _byStatus(KanbanStatus.todo),
-                onTaskDropped: _moveTask),
+                onTaskDropped: _moveTask,
+                onTaskTap: _editTaskDialog),
             KanbanColumn(
                 title: 'In Progress',
                 status: KanbanStatus.inProgress,
                 tasks: _byStatus(KanbanStatus.inProgress),
-                onTaskDropped: _moveTask),
+                onTaskDropped: _moveTask,
+                onTaskTap: _editTaskDialog),
             KanbanColumn(
                 title: 'Done',
                 status: KanbanStatus.done,
                 tasks: _byStatus(KanbanStatus.done),
-                onTaskDropped: _moveTask),
+                onTaskDropped: _moveTask,
+                onTaskTap: _editTaskDialog),
           ],
         ),
       ),

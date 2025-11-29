@@ -61,6 +61,23 @@ git reset --hard HEAD
 flutter run
 ```
 
+Firestore (правила безопасности)
+
+В этом проекте задачи сохраняются в Firestore по пути `users/{uid}/tasks/{taskId}` — это означает, что каждая задача принадлежит конкретному пользователю.
+Чтобы запретить доступ к задачам других пользователей, добавьте в консоли Firebase следующие правила для Firestore:
+
+```firestore
+service cloud.firestore {
+	match /databases/{database}/documents {
+		match /users/{userId}/tasks/{taskId} {
+			allow read, write: if request.auth != null && request.auth.uid == userId;
+		}
+	}
+}
+```
+
+После этого каждый пользователь сможет создавать, редактировать и удалять только свои задачи, а в UI приложение автоматически показывает только задачи для текущего пользователя.
+
 Где смотреть код
 - Точка входа: `lib/main.dart` (инициализация Firebase, StreamBuilder по `authStateChanges`)
 - Авторизация: `lib/services/firebase_auth_service.dart` и `lib/pages/login_page.dart` / `lib/pages/register_page.dart`
