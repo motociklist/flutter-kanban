@@ -27,7 +27,7 @@ class KanbanColumn extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
           ],
         ),
@@ -36,12 +36,12 @@ class KanbanColumn extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Spacer(),
+                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Spacer(),
                 CircleAvatar(radius: 12, child: Text('${tasks.length}')),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Expanded(
               child: DragTarget<KanbanTask>(
                 onWillAcceptWithDetails: (details) => details.data.status != status,
@@ -57,7 +57,7 @@ class KanbanColumn extends StatelessWidget {
                                   feedback: Material(
                                     color: Colors.transparent,
                                     child: ConstrainedBox(
-                                      constraints: BoxConstraints(maxWidth: 260),
+                                      constraints: const BoxConstraints(maxWidth: 260),
                                       child: KanbanCard(task: t, isDragging: true, colorForStatus: _colorForStatus),
                                     ),
                                   ),
@@ -82,11 +82,11 @@ class KanbanColumn extends StatelessWidget {
   Color _colorForStatus(KanbanStatus status, BuildContext context) {
     switch (status) {
       case KanbanStatus.todo:
-        return Color(0xFFE3F2FD); // light blue
+        return const Color(0xFFE3F2FD); // light blue
       case KanbanStatus.inProgress:
-        return Color(0xFFFFF3E0); // light orange
+        return const Color(0xFFFFF3E0); // light orange
       case KanbanStatus.done:
-        return Color(0xFFE8F5E9); // light green
+        return const Color(0xFFE8F5E9); // light green
       default:
         return Theme.of(context).cardColor;
     }

@@ -1,99 +1,76 @@
-# Kanban+ - Flutter App с Firebase Authentication
+# Demo Flutter App
 
-Приложение Kanban с аутентификацией через Firebase, drag-and-drop для управления задачами и красивым интерфейсом.
+Простое Flutter-приложение с одним экраном и счётчиком.
 
-## 🚀 Быстрый старт
+Как запустить:
 
-### 1. Установка зависимостей
+1. Убедитесь, что установлен Flutter SDK: https://flutter.dev
+2. В корне проекта выполните:
+
+```bash
+flutter pub get
+flutter run
+flutter run -d chrome
+git pull origin main
+
+# flutter-kanban
+
+Kanban-проект на Flutter с простой авторизацией через Firebase (email/password) и доской задач (To Do / In Progress / Done).
+
+Ключевые фичи
+- Канбан-доска с перетаскиванием задач
+- Регистрация и вход через Firebase Authentication
+- Простая страница профиля с отображением имени и email текущего пользователя
+- Темы и централизованные стили в `lib/styles`
+
+Структура проекта (важные папки)
+- `lib/pages/` — экран(ы): `kanban_page.dart`, `login_page.dart`, `register_page.dart`, `profile_page.dart`
+- `lib/widgets/` — переиспользуемые виджеты (карточка задачи, колонка)
+- `lib/models/` — модели (например, `kanban_task.dart`)
+- `lib/services/` — сервисы (например, `firebase_auth_service.dart`)
+- `lib/styles/` — тема и стили (barrel: `lib/styles/styles.dart`)
+
+Требования
+- Flutter SDK (рекомендуется последняя стабильная версия)
+- Firebase project (создайте проект в Firebase и настройте для платформ, которые используете)
+
+Быстрый старт (локально)
+1. Установите Flutter: https://flutter.dev
+2. В корне проекта выполните:
+
 ```bash
 flutter pub get
 ```
 
-### 2. Настройка Firebase (ВАЖНО!)
+3. Настройте Firebase для проекта:
+	 - Установите и настройте `flutterfire` CLI (опционально):
+		 ```bash
+		 dart pub global activate flutterfire_cli
+		 flutterfire configure
+		 ```
+	 - Поместите сгенерированный `lib/firebase_options.dart` в проект (если не создан).
 
-Для работы аутентификации нужно настроить Firebase:
-
-```bash
-# Если flutterfire не установлена:
-dart pub global activate flutterfire_cli
-
-# Конфигурация Firebase (интерактивный режим)
-flutterfire configure --android-package-name=com.example.flutterkanban
-```
-
-**Альтернативно**, заполните вручную в `lib/firebase_options.dart`:
-- Замените `YOUR_WEB_API_KEY`, `YOUR_ANDROID_API_KEY`, и т.д. на реальные ключи
-- Получите ключи на [Firebase Console](https://console.firebase.google.com)
-
-### 3. Запуск приложения
+4. Запустите приложение:
 
 ```bash
-# Для веб-браузера (рекомендуется для тестирования)
+# запуск на вебе
 flutter run -d chrome
+git reset --hard HEAD
 
-# Для Android эмулятора
-flutter emulators --launch <emulator-id>
-flutter run
-
-# Для физического устройства
+# или на подключённом устройстве / эмуляторе
 flutter run
 ```
 
-## ✨ Особенности
+Где смотреть код
+- Точка входа: `lib/main.dart` (инициализация Firebase, StreamBuilder по `authStateChanges`)
+- Авторизация: `lib/services/firebase_auth_service.dart` и `lib/pages/login_page.dart` / `lib/pages/register_page.dart`
+- Канбан: `lib/pages/kanban_page.dart`, виджеты — `lib/widgets/kanban_card.dart`, `lib/widgets/kanban_column.dart`
+- Профиль: `lib/pages/profile_page.dart` (показывает данные `FirebaseAuth.instance.currentUser`)
 
-- **Firebase Authentication** — регистрация и вход по email/пароль
-- **Kanban Board** — три колонки (To Do, In Progress, Done)
-- **Drag & Drop** — перетаскивание задач между колонками
-- **Tab Navigation** — 4 вкладки (Board, Today, Completed, Account)
-- **Обработка ошибок** — русские сообщения об ошибках регистрации/входа
-- **Красивый UI** — градиенты, карточки, плавные анимации
+Советы
+- Если после настройки Firebase вход/регистрация не работают — проверьте, что в Firebase Console включены Email/Password провайдеры.
+- Для отладки аутентификации используйте логи в консоли и `flutter run -d chrome`.
 
-## 📁 Структура проекта
-
-```
-lib/
-├── main.dart                      — точка входа приложения
-├── firebase_options.dart          — конфигурация Firebase
-├── login_page.dart                — страница входа
-├── register_page.dart             — страница регистрации
-├── pages/
-│   └── kanban_page.dart           — главная страница с Kanban
-├── services/
-│   └── firebase_auth_service.dart — сервис аутентификации
-├── models/
-│   └── kanban_task.dart           — модель задачи
-├── widgets/
-│   ├── kanban_card.dart           — компонент карточки
-│   └── kanban_column.dart         — компонент колонки
-└── styles.dart                    — стили и палитра цветов
-```
-
-## 🔐 Процесс аутентификации
-
-1. **При первом запуске** — показывается страница входа
-2. **Регистрация** — создание аккаунта с email/пароль
-3. **После успешной регистрации** — автоматический вход и переход на главную
-4. **Главная страница** — Kanban Board с управлением задачами
-5. **Выход** — кнопка Logout в AppBar или Account вкладке
-
-## 🛠️ Требования
-
-- Flutter: >=2.5.0
-- Dart: >=2.17.0
-- Firebase Core: ^3.0.0
-- Firebase Auth: ^5.0.0
-
-## ✅ Проверка
-
-```bash
-# Анализ кода
-flutter analyze
-
-# Форматирование
-dart format lib/
-```
-
----
-
-Made with ❤️ using Flutter & Firebase
-
+Если нужно, могу:
+- Помочь настроить `flutterfire configure` и `firebase_options.dart`.
+- Запустить приложение и проверить flow логина/профиля.
