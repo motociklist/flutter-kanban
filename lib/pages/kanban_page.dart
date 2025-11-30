@@ -27,61 +27,18 @@ class _KanbanPageState extends State<KanbanPage> {
   @override
   void initState() {
     super.initState();
-    _tasks = [
-      KanbanTask(
-          id: _id(),
-          title: 'Design app shell',
-          description: 'Create basic routes and appbar',
-          status: KanbanStatus.todo,
-          color: Colors.white,
-          createdAt: DateTime.now()),
-      KanbanTask(
-          id: _id(),
-          title: 'Auth flow',
-          description: 'Login / Logout screens',
-          status: KanbanStatus.inProgress,
-          color: Colors.white,
-          createdAt: DateTime.now().subtract(const Duration(days: 1))),
-      KanbanTask(
-          id: _id(),
-          title: 'Write tests',
-          description: 'Add basic widget tests',
-          status: KanbanStatus.done,
-          color: Colors.white,
-          createdAt: DateTime.now()),
-    ];
+    // Initially no local demo tasks — only show tasks coming from Firestore
+    _tasks = [];
 
     // Subscribe to auth state changes to attach/detach Firestore listeners
     _authService.authStateChanges.listen((user) {
       if (user != null) {
         _subscribeToTasks();
       } else {
-        // fallback to demo tasks on logout
+        // on logout, clear tasks — we only display backend tasks
         _unsubscribeFromTasks();
         setState(() {
-          _tasks = [
-            KanbanTask(
-                id: _id(),
-                title: 'Design app shell',
-                description: 'Create basic routes and appbar',
-                status: KanbanStatus.todo,
-                color: Colors.white,
-                createdAt: DateTime.now()),
-            KanbanTask(
-                id: _id(),
-                title: 'Auth flow',
-                description: 'Login / Logout screens',
-                status: KanbanStatus.inProgress,
-                color: Colors.white,
-                createdAt: DateTime.now().subtract(const Duration(days: 1))),
-            KanbanTask(
-                id: _id(),
-                title: 'Write tests',
-                description: 'Add basic widget tests',
-                status: KanbanStatus.done,
-                color: Colors.white,
-                createdAt: DateTime.now()),
-          ];
+          _tasks = [];
         });
       }
     });
@@ -143,6 +100,33 @@ class _KanbanPageState extends State<KanbanPage> {
   }
 
   Future<void> _addTaskDialog() async {
+    if (_authService.currentUser == null) {
+      // If not logged in, prompt to log in before creating tasks. We only allow
+      // tasks to be created and displayed when they are stored in Firestore.
+      final res = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Login required'),
+          content: const Text('Please log in to add tasks to your board.'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel')),
+            ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context, true);
+                },
+                child: const Text('Login'))
+          ],
+        ),
+      );
+      if (res == true) {
+        // Open login page: on successful auth, authStateChanges will re-sync tasks
+        await Navigator.of(context).push<bool>(
+            MaterialPageRoute(builder: (_) => LoginPage(onLogin: () {})));
+      }
+      return;
+    }
     final formKey = GlobalKey<FormState>();
     String title = '';
     String desc = '';
