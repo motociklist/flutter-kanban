@@ -121,9 +121,10 @@ class _KanbanPageState extends State<KanbanPage> {
         ),
       );
       if (res == true) {
-        // Open login page: on successful auth, authStateChanges will re-sync tasks
+        if (!mounted) return; // проверяем, что виджет ещё в дереве
         await Navigator.of(context).push<bool>(
-            MaterialPageRoute(builder: (_) => LoginPage(onLogin: () {})));
+          MaterialPageRoute(builder: (_) => LoginPage(onLogin: () {})),
+        );
       }
       return;
     }
