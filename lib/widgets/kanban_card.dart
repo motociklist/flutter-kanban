@@ -53,6 +53,30 @@ class KanbanCard extends StatelessWidget {
                   style:
                       TextStyle(fontSize: 13, color: textColor.withAlpha(230))),
             ]
+            ,
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Created: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
+                    style: TextStyle(fontSize: 11, color: textColor.withAlpha(200)),
+                  ),
+                ),
+                if (task.deadline != null)
+                  Text('Due: ${task.deadline!.toLocal().toIso8601String().split("T").first}',
+                      style: TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(task.createdBy ?? '', style: TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
+                Text(task.status.name, style: TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
+              ],
+            )
           ],
         ),
       ),

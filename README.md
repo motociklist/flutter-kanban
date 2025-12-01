@@ -55,6 +55,7 @@ flutter pub get
 ```bash
 # запуск на вебе
 flutter run -d chrome
+1@gmail.com
 git reset --hard HEAD
 
 # или на подключённом устройстве / эмуляторе

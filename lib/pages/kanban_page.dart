@@ -91,7 +91,9 @@ class _KanbanPageState extends State<KanbanPage> {
             description: task.description,
             status: to,
             color: task.color,
-            createdAt: task.createdAt);
+            createdAt: task.createdAt,
+            deadline: task.deadline,
+            createdBy: task.createdBy);
         _taskService.updateTask(updated);
       } catch (e) {
         debugPrint('Error updating task status: $e');
@@ -131,10 +133,12 @@ class _KanbanPageState extends State<KanbanPage> {
     final formKey = GlobalKey<FormState>();
     String title = '';
     String desc = '';
+    DateTime? deadline;
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => StatefulBuilder(
+          builder: (context, dialogSetState) => AlertDialog(
         title: const Text('New task'),
         content: Form(
           key: formKey,
@@ -151,6 +155,27 @@ class _KanbanPageState extends State<KanbanPage> {
                 decoration: const InputDecoration(labelText: 'Description'),
                 onSaved: (v) => desc = v ?? '',
               ),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(
+                    child: Text(deadline != null
+                        ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
+                        : 'No deadline')),
+                TextButton(
+                    onPressed: () async {
+                      final picked = await showDatePicker(
+                          context: context,
+                          initialDate: deadline ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100));
+                      if (picked != null) {
+                        dialogSetState(() {
+                          deadline = picked;
+                        });
+                      }
+                    },
+                    child: const Text('Pick date')),
+              ]),
             ],
           ),
         ),
@@ -167,15 +192,18 @@ class _KanbanPageState extends State<KanbanPage> {
             child: const Text('Add'),
           ),
         ],
-      ),
+          )),
     );
 
     if (ok == true) {
       final newTask = KanbanTask(
-          id: _id(),
-          title: title,
-          description: desc,
-          status: KanbanStatus.todo);
+        id: _id(),
+        title: title,
+        description: desc,
+        status: KanbanStatus.todo,
+        deadline: deadline,
+        createdBy: _authService.currentUser?.displayName ??
+          _authService.currentUser?.uid);
       if (_authService.currentUser != null) {
         try {
           await _taskService.addTask(newTask);
@@ -194,10 +222,13 @@ class _KanbanPageState extends State<KanbanPage> {
     final formKey = GlobalKey<FormState>();
     String title = task.title;
     String desc = task.description ?? '';
+    KanbanStatus status = task.status;
+    DateTime? deadline = task.deadline;
 
     final ok = await showDialog<String?>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => StatefulBuilder(
+          builder: (context, dialogSetState) => AlertDialog(
         title: const Text('Edit task'),
         content: Form(
           key: formKey,
@@ -216,6 +247,44 @@ class _KanbanPageState extends State<KanbanPage> {
                 decoration: const InputDecoration(labelText: 'Description'),
                 onSaved: (v) => desc = v ?? '',
               ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<KanbanStatus>(
+                value: status,
+                decoration: const InputDecoration(labelText: 'Status'),
+                items: KanbanStatus.values
+                    .map((s) => DropdownMenuItem(
+                        value: s, child: Text(s.name)))
+                    .toList(),
+                onChanged: (v) => status = v ?? status,
+              ),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(
+                  child: Text(deadline != null
+                      ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
+                      : 'No deadline'),
+                ),
+                TextButton(
+                    onPressed: () async {
+                      final picked = await showDatePicker(
+                          context: context,
+                          initialDate: deadline ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100));
+                      if (picked != null) {
+                        dialogSetState(() {
+                          deadline = picked;
+                        });
+                      }
+                    },
+                    child: const Text('Pick date')),
+              ]),
+              const SizedBox(height: 8),
+              if (task.createdBy != null)
+                Text('Creator: ${task.createdBy!}',
+                    style: const TextStyle(fontSize: 12)),
+              Text('Created: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
+                  style: const TextStyle(fontSize: 12)),
             ],
           ),
         ),
@@ -238,7 +307,7 @@ class _KanbanPageState extends State<KanbanPage> {
             child: const Text('Save'),
           ),
         ],
-      ),
+          )),
     );
 
     if (ok == 'delete') {
@@ -259,9 +328,11 @@ class _KanbanPageState extends State<KanbanPage> {
           id: task.id,
           title: title,
           description: desc,
-          status: task.status,
+          status: status,
           color: task.color,
-          createdAt: task.createdAt);
+          createdAt: task.createdAt,
+          deadline: deadline,
+          createdBy: task.createdBy);
       if (_authService.currentUser != null) {
         try {
           await _taskService.updateTask(updated);

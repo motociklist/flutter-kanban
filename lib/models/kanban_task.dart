@@ -9,6 +9,8 @@ class KanbanTask {
   KanbanStatus status;
   Color? color;
   DateTime createdAt;
+  DateTime? deadline;
+  String? createdBy; // uid or display name
 
   KanbanTask({
     required this.id,
@@ -17,5 +19,7 @@ class KanbanTask {
     this.status = KanbanStatus.todo,
     this.color,
     DateTime? createdAt,
+    this.deadline,
+    this.createdBy,
   }) : createdAt = createdAt ?? DateTime.now();
 }
