@@ -139,71 +139,72 @@ class _KanbanPageState extends State<KanbanPage> {
       context: context,
       builder: (context) => StatefulBuilder(
           builder: (context, dialogSetState) => AlertDialog(
-        title: const Text('New task'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Title'),
-                onSaved: (v) => title = v ?? '',
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Enter title' : null,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Description'),
-                onSaved: (v) => desc = v ?? '',
-              ),
-              const SizedBox(height: 8),
-              Row(children: [
-                Expanded(
-                    child: Text(deadline != null
-                        ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
-                        : 'No deadline')),
-                TextButton(
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                          context: context,
-                          initialDate: deadline ?? DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100));
-                      if (picked != null) {
-                        dialogSetState(() {
-                          deadline = picked;
-                        });
-                      }
+                title: const Text('New task'),
+                content: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        decoration: const InputDecoration(labelText: 'Title'),
+                        onSaved: (v) => title = v ?? '',
+                        validator: (v) =>
+                            (v == null || v.isEmpty) ? 'Enter title' : null,
+                      ),
+                      TextFormField(
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                        onSaved: (v) => desc = v ?? '',
+                      ),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        Expanded(
+                            child: Text(deadline != null
+                                ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
+                                : 'No deadline')),
+                        TextButton(
+                            onPressed: () async {
+                              final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: deadline ?? DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100));
+                              if (picked != null) {
+                                dialogSetState(() {
+                                  deadline = picked;
+                                });
+                              }
+                            },
+                            child: const Text('Pick date')),
+                      ]),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel')),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (!formKey.currentState!.validate()) return;
+                      formKey.currentState!.save();
+                      Navigator.pop(context, true);
                     },
-                    child: const Text('Pick date')),
-              ]),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              if (!formKey.currentState!.validate()) return;
-              formKey.currentState!.save();
-              Navigator.pop(context, true);
-            },
-            child: const Text('Add'),
-          ),
-        ],
-          )),
+                    child: const Text('Add'),
+                  ),
+                ],
+              )),
     );
 
     if (ok == true) {
       final newTask = KanbanTask(
-        id: _id(),
-        title: title,
-        description: desc,
-        status: KanbanStatus.todo,
-        deadline: deadline,
-        createdBy: _authService.currentUser?.displayName ??
-          _authService.currentUser?.uid);
+          id: _id(),
+          title: title,
+          description: desc,
+          status: KanbanStatus.todo,
+          deadline: deadline,
+          createdBy: _authService.currentUser?.displayName ??
+              _authService.currentUser?.uid);
       if (_authService.currentUser != null) {
         try {
           await _taskService.addTask(newTask);
@@ -229,85 +230,88 @@ class _KanbanPageState extends State<KanbanPage> {
       context: context,
       builder: (context) => StatefulBuilder(
           builder: (context, dialogSetState) => AlertDialog(
-        title: const Text('Edit task'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                initialValue: title,
-                decoration: const InputDecoration(labelText: 'Title'),
-                onSaved: (v) => title = v ?? '',
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Enter title' : null,
-              ),
-              TextFormField(
-                initialValue: desc,
-                decoration: const InputDecoration(labelText: 'Description'),
-                onSaved: (v) => desc = v ?? '',
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<KanbanStatus>(
-                value: status,
-                decoration: const InputDecoration(labelText: 'Status'),
-                items: KanbanStatus.values
-                    .map((s) => DropdownMenuItem(
-                        value: s, child: Text(s.name)))
-                    .toList(),
-                onChanged: (v) => status = v ?? status,
-              ),
-              const SizedBox(height: 8),
-              Row(children: [
-                Expanded(
-                  child: Text(deadline != null
-                      ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
-                      : 'No deadline'),
+                title: const Text('Edit task'),
+                content: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        initialValue: title,
+                        decoration: const InputDecoration(labelText: 'Title'),
+                        onSaved: (v) => title = v ?? '',
+                        validator: (v) =>
+                            (v == null || v.isEmpty) ? 'Enter title' : null,
+                      ),
+                      TextFormField(
+                        initialValue: desc,
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                        onSaved: (v) => desc = v ?? '',
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<KanbanStatus>(
+                        initialValue: status,
+                        decoration: const InputDecoration(labelText: 'Status'),
+                        items: KanbanStatus.values
+                            .map((s) =>
+                                DropdownMenuItem(value: s, child: Text(s.name)))
+                            .toList(),
+                        onChanged: (v) => status = v ?? status,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        Expanded(
+                          child: Text(deadline != null
+                              ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
+                              : 'No deadline'),
+                        ),
+                        TextButton(
+                            onPressed: () async {
+                              final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: deadline ?? DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100));
+                              if (picked != null) {
+                                dialogSetState(() {
+                                  deadline = picked;
+                                });
+                              }
+                            },
+                            child: const Text('Pick date')),
+                      ]),
+                      const SizedBox(height: 8),
+                      if (task.createdBy != null)
+                        Text('Creator: ${task.createdBy!}',
+                            style: const TextStyle(fontSize: 12)),
+                      Text(
+                          'Created: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
+                          style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
                 ),
-                TextButton(
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                          context: context,
-                          initialDate: deadline ?? DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100));
-                      if (picked != null) {
-                        dialogSetState(() {
-                          deadline = picked;
-                        });
-                      }
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, null),
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () async {
+                        // delete
+                        Navigator.pop(context, 'delete');
+                      },
+                      child: const Text('Delete',
+                          style: TextStyle(color: Colors.red))),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (!formKey.currentState!.validate()) return;
+                      formKey.currentState!.save();
+                      Navigator.pop(context, 'save');
                     },
-                    child: const Text('Pick date')),
-              ]),
-              const SizedBox(height: 8),
-              if (task.createdBy != null)
-                Text('Creator: ${task.createdBy!}',
-                    style: const TextStyle(fontSize: 12)),
-              Text('Created: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
-                  style: const TextStyle(fontSize: 12)),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () async {
-                // delete
-                Navigator.pop(context, 'delete');
-              },
-              child: const Text('Delete', style: TextStyle(color: Colors.red))),
-          ElevatedButton(
-            onPressed: () {
-              if (!formKey.currentState!.validate()) return;
-              formKey.currentState!.save();
-              Navigator.pop(context, 'save');
-            },
-            child: const Text('Save'),
-          ),
-        ],
-          )),
+                    child: const Text('Save'),
+                  ),
+                ],
+              )),
     );
 
     if (ok == 'delete') {

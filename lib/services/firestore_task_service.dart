@@ -50,29 +50,29 @@ class FirestoreTaskService {
         .map((snap) => snap.docs.map((d) => _fromMap(d.data())).toList());
   }
 
-    Map<String, dynamic> _toMap(KanbanTask t) => {
+  Map<String, dynamic> _toMap(KanbanTask t) => {
         'id': t.id,
         'title': t.title,
         'description': t.description,
         'status': t.status.index,
-      'color': t.color?.value,
+        'color': t.color?.toARGB32(),
         'createdAt': t.createdAt.millisecondsSinceEpoch,
-      'deadline': t.deadline?.millisecondsSinceEpoch,
-      'createdBy': t.createdBy,
+        'deadline': t.deadline?.millisecondsSinceEpoch,
+        'createdBy': t.createdBy,
       };
 
-    KanbanTask _fromMap(Map<String, dynamic> map) => KanbanTask(
+  KanbanTask _fromMap(Map<String, dynamic> map) => KanbanTask(
         id: map['id'],
         title: map['title'],
         description: map['description'],
         status: KanbanStatus.values[map['status'] ?? 0],
-      color: map['color'] != null ? Color(map['color']) : null,
+        color: map['color'] != null ? Color(map['color']) : null,
         createdAt: map['createdAt'] != null
             ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
             : DateTime.now(),
-      deadline: map['deadline'] != null
-      ? DateTime.fromMillisecondsSinceEpoch(map['deadline'])
-      : null,
-      createdBy: map['createdBy'],
+        deadline: map['deadline'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(map['deadline'])
+            : null,
+        createdBy: map['createdBy'],
       );
 }
