@@ -17,6 +17,28 @@ class KanbanCard extends StatelessWidget {
       required this.colorForStatus})
       : super(key: key);
 
+  String _getStatusLabel(KanbanStatus status) {
+    switch (status) {
+      case KanbanStatus.todo:
+        return 'К выполнению';
+      case KanbanStatus.inProgress:
+        return 'В процессе';
+      case KanbanStatus.done:
+        return 'Завершено';
+    }
+  }
+
+  Color _getStatusColor(KanbanStatus status) {
+    switch (status) {
+      case KanbanStatus.todo:
+        return Colors.blue;
+      case KanbanStatus.inProgress:
+        return Colors.orange;
+      case KanbanStatus.done:
+        return Colors.green;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bg = task.color ?? colorForStatus(task.status, context);
@@ -52,29 +74,49 @@ class KanbanCard extends StatelessWidget {
               Text(task.description!,
                   style:
                       TextStyle(fontSize: 13, color: textColor.withAlpha(230))),
-            ]
-            ,
+            ],
+            const SizedBox(height: 8),
+            // Статус тег
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: _getStatusColor(task.status).withAlpha(180),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                _getStatusLabel(task.status),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
-                    'Created: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
-                    style: TextStyle(fontSize: 11, color: textColor.withAlpha(200)),
+                    'Создано: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
+                    style:
+                        TextStyle(fontSize: 11, color: textColor.withAlpha(200)),
                   ),
                 ),
                 if (task.deadline != null)
-                  Text('Due: ${task.deadline!.toLocal().toIso8601String().split("T").first}',
-                      style: TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
+                  Text(
+                      'До: ${task.deadline!.toLocal().toIso8601String().split("T").first}',
+                      style: TextStyle(
+                          fontSize: 11, color: textColor.withAlpha(200))),
               ],
             ),
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(task.createdBy ?? '', style: TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
-                Text(task.status.name, style: TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
+                Text(task.createdBy ?? '',
+                    style:
+                        TextStyle(fontSize: 11, color: textColor.withAlpha(200))),
               ],
             )
           ],
