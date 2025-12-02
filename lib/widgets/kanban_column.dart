@@ -52,42 +52,72 @@ class KanbanColumn extends StatelessWidget {
               child: DragTarget<KanbanTask>(
                 onWillAcceptWithDetails: (details) =>
                     details.data.status != status,
-                onAcceptWithDetails: (details) =>
-                    onTaskDropped(details.data, status),
+                onAcceptWithDetails: (details) {
+                  // Вызываем callback для обновления статуса задачи
+                  onTaskDropped(details.data, status);
+                },
                 builder: (context, candidateData, rejectedData) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: tasks
-                          .map((t) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 6.0),
-                                child: Draggable<KanbanTask>(
-                                  data: t,
-                                  feedback: Material(
-                                    color: Colors.transparent,
-                                    child: ConstrainedBox(
-                                      constraints:
-                                          const BoxConstraints(maxWidth: 260),
-                                      child: KanbanCard(
-                                          task: t,
-                                          isDragging: true,
-                                          colorForStatus: _colorForStatus),
+                  // Подсвечиваем колонку, когда над ней находится задача
+                  final isHovering = candidateData.isNotEmpty;
+                  
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: isHovering
+                          ? Border.all(
+                              color: Colors.green,
+                              width: 2,
+                            )
+                          : null,
+                      color: isHovering
+                          ? Colors.green.withAlpha(25)
+                          : Colors.transparent,
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: tasks
+                            .map((t) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 6.0),
+                                  child: Draggable<KanbanTask>(
+                                    data: t,
+                                    feedback: Material(
+                                      color: Colors.transparent,
+                                      child: ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                            maxWidth: 260),
+                                        child: KanbanCard(
+                                            task: t,
+                                            isDragging: true,
+                                            colorForStatus: _colorForStatus),
+                                      ),
                                     ),
+                                    childWhenDragging: Opacity(
+                                        opacity: 0.4,
+                                        child: KanbanCard(
+                                            task: t,
+                                            colorForStatus: _colorForStatus)),
+                                    onDragStarted: () {
+                                      // Визуальная обратная связь при начале перетаскивания
+                                      debugPrint(
+                                          'Начало перетаскивания: ${t.title}');
+                                    },
+                                    onDraggableCanceled: (velocity, offset) {
+                                      // Отмена перетаскивания
+                                      debugPrint(
+                                          'Перетаскивание отменено: ${t.title}');
+                                    },
+                                    child: KanbanCard(
+                                        task: t,
+                                        colorForStatus: _colorForStatus,
+                                        onTap: (task) =>
+                                            onTaskTap?.call(task) ??
+                                            Future.value()),
                                   ),
-                                  childWhenDragging: Opacity(
-                                      opacity: 0.4,
-                                      child: KanbanCard(
-                                          task: t,
-                                          colorForStatus: _colorForStatus)),
-                                  child: KanbanCard(
-                                      task: t,
-                                      colorForStatus: _colorForStatus,
-                                      onTap: (task) =>
-                                          onTaskTap?.call(task) ??
-                                          Future.value()),
-                                ),
-                              ))
-                          .toList(),
+                                ))
+                            .toList(),
+                      ),
                     ),
                   );
                 },

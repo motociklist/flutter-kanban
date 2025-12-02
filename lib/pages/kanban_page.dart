@@ -78,12 +78,22 @@ class _KanbanPageState extends State<KanbanPage> {
       _tasks.where((t) => t.status == s).toList();
 
   void _moveTask(KanbanTask task, KanbanStatus to) {
+    // Проверяем, что статус действительно изменился
+    if (task.status == to) {
+      debugPrint('Статус уже $to');
+      return;
+    }
+
+    // Находим задачу в списке и обновляем её статус
     setState(() {
       final idx = _tasks.indexWhere((t) => t.id == task.id);
-      if (idx != -1) _tasks[idx].status = to;
+      if (idx != -1) {
+        _tasks[idx].status = to;
+      }
     });
+
+    // Обновляем статус на backend
     if (_authService.currentUser != null) {
-      // update on the backend
       try {
         final updated = KanbanTask(
             id: task.id,
@@ -94,9 +104,46 @@ class _KanbanPageState extends State<KanbanPage> {
             createdAt: task.createdAt,
             deadline: task.deadline,
             createdBy: task.createdBy);
-        _taskService.updateTask(updated);
+        _taskService.updateTask(updated).then((_) {
+          debugPrint('Задача "${task.title}" успешно перемещена в $to');
+          // Показываем уведомление пользователю
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Задача "${task.title}" перемещена'),
+                duration: const Duration(seconds: 2),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        }).catchError((error) {
+          debugPrint('Ошибка при обновлении задачи: $error');
+          // Откатываем изменение в UI если произошла ошибка
+          setState(() {
+            final idx = _tasks.indexWhere((t) => t.id == task.id);
+            if (idx != -1) {
+              _tasks[idx].status = task.status;
+            }
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Ошибка при перемещении задачи'),
+                duration: Duration(seconds: 2),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
       } catch (e) {
-        debugPrint('Error updating task status: $e');
+        debugPrint('Ошибка обновления задачи: $e');
+        // Откатываем изменение
+        setState(() {
+          final idx = _tasks.indexWhere((t) => t.id == task.id);
+          if (idx != -1) {
+            _tasks[idx].status = task.status;
+          }
+        });
       }
     }
   }
