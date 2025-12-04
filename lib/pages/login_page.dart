@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                         Icon(Icons.dashboard_customize,
                             size: 64, color: Colors.white),
                         SizedBox(height: 8),
-                        Text('Welcome to Kanban+',
+                        Text('Добро пожаловать в Канбан+',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           TextFormField(
                             decoration: InputDecoration(
-                              hintText: 'Email',
+                              hintText: 'Электронная почта',
                               prefixIcon: const Icon(Icons.email_outlined),
                               filled: true,
                               fillColor: Colors.grey.shade100,
@@ -148,12 +148,12 @@ class _LoginPageState extends State<LoginPage> {
                             keyboardType: TextInputType.emailAddress,
                             onSaved: (v) => _email = v ?? '',
                             validator: (v) =>
-                                (v == null || v.isEmpty) ? 'Enter email' : null,
+                                (v == null || v.isEmpty) ? 'Введите email' : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             decoration: InputDecoration(
-                              hintText: 'Password',
+                              hintText: 'Пароль',
                               prefixIcon: const Icon(Icons.lock_outline),
                               filled: true,
                               fillColor: Colors.grey.shade100,
@@ -164,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                             obscureText: true,
                             onSaved: (v) => _password = v ?? '',
                             validator: (v) => (v == null || v.length < 4)
-                                ? 'Password too short'
+                                ? 'Пароль слишком короткий'
                                 : null,
                           ),
                           const SizedBox(height: 20),
@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                                       height: 18,
                                       child: CircularProgressIndicator(
                                           color: Colors.white, strokeWidth: 2))
-                                  : const Text('Login',
+                                  : const Text('Войти',
                                       style: TextStyle(
                                           fontSize: 16, color: Colors.white)),
                             ),
@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                                       builder: (_) => const RegisterPage()));
                             },
                             child:
-                                const Text("Don't have an account? Register"),
+                                const Text("Нет аккаунта? Зарегистрируйтесь"),
                           ),
                         ],
                       ),

@@ -95,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       children: [
                         Icon(Icons.person_add, size: 64, color: Colors.white),
                         SizedBox(height: 8),
-                        Text('Create account',
+                        Text('Создать аккаунт',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -135,43 +135,43 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           TextFormField(
                             decoration: AppStyles.inputDecoration(
-                                hint: 'Full Name',
+                                hint: 'Полное имя',
                                 prefixIcon: Icons.person_outline),
                             onSaved: (v) => _displayName = v ?? '',
                             validator: (v) => (v == null || v.isEmpty)
-                                ? 'Enter your name'
+                                ? 'Введите ваше имя'
                                 : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             decoration: AppStyles.inputDecoration(
-                                hint: 'Email',
+                                hint: 'Электронная почта',
                                 prefixIcon: Icons.email_outlined),
                             keyboardType: TextInputType.emailAddress,
                             onSaved: (v) => _email = v ?? '',
                             validator: (v) =>
-                                (v == null || v.isEmpty) ? 'Enter email' : null,
+                                (v == null || v.isEmpty) ? 'Введите email' : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             decoration: AppStyles.inputDecoration(
-                                hint: 'Password',
+                                hint: 'Пароль',
                                 prefixIcon: Icons.lock_outline),
                             obscureText: true,
                             onSaved: (v) => _password = v ?? '',
                             validator: (v) => (v == null || v.length < 4)
-                                ? 'Password too short'
+                                ? 'Пароль слишком короткий'
                                 : null,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
                             decoration: AppStyles.inputDecoration(
-                                hint: 'Confirm Password',
+                                hint: 'Подтвердите пароль',
                                 prefixIcon: Icons.lock_outline),
                             obscureText: true,
                             onSaved: (v) => _confirm = v ?? '',
                             validator: (v) => (v == null || v.length < 4)
-                                ? 'Confirm password'
+                                ? 'Подтвердите пароль'
                                 : null,
                           ),
                           const SizedBox(height: 20),
@@ -194,7 +194,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       height: 18,
                                       child: CircularProgressIndicator(
                                           color: Colors.white, strokeWidth: 2))
-                                  : const Text('Register',
+                                  : const Text('Зарегистрироваться',
                                       style: TextStyle(
                                           fontSize: 16, color: Colors.white)),
                             ),

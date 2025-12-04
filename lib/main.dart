@@ -34,7 +34,7 @@ class DemoApp extends StatelessWidget {
       valueListenable: darkMode,
       builder: (context, isDark, _) {
         return MaterialApp(
-          title: 'Demo Flutter App',
+          title: 'Приложение Канбан',
           theme: AppStyles.lightTheme,
           darkTheme: AppStyles.darkTheme,
           themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
