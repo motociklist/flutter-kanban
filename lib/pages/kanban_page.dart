@@ -155,17 +155,17 @@ class _KanbanPageState extends State<KanbanPage> {
       final res = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Login required'),
-          content: const Text('Please log in to add tasks to your board.'),
+          title: const Text('Требуется вход'),
+          content: const Text('Пожалуйста, войдите, чтобы добавить задачи на доску.'),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel')),
+                child: const Text('Отмена')),
             ElevatedButton(
                 onPressed: () async {
                   Navigator.pop(context, true);
                 },
-                child: const Text('Login'))
+                child: const Text('Войти'))
           ],
         ),
       );
@@ -186,29 +186,29 @@ class _KanbanPageState extends State<KanbanPage> {
       context: context,
       builder: (context) => StatefulBuilder(
           builder: (context, dialogSetState) => AlertDialog(
-                title: const Text('New task'),
+                title: const Text('Новая задача'),
                 content: Form(
                   key: formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
-                        decoration: const InputDecoration(labelText: 'Title'),
+                        decoration: const InputDecoration(labelText: 'Название'),
                         onSaved: (v) => title = v ?? '',
                         validator: (v) =>
-                            (v == null || v.isEmpty) ? 'Enter title' : null,
+                            (v == null || v.isEmpty) ? 'Введите название' : null,
                       ),
                       TextFormField(
                         decoration:
-                            const InputDecoration(labelText: 'Description'),
+                            const InputDecoration(labelText: 'Описание'),
                         onSaved: (v) => desc = v ?? '',
                       ),
                       const SizedBox(height: 8),
                       Row(children: [
                         Expanded(
                             child: Text(deadline != null
-                                ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
-                                : 'No deadline')),
+                                ? 'Срок: ${deadline!.toLocal().toIso8601String().split("T").first}'
+                                : 'Без срока')),
                         TextButton(
                             onPressed: () async {
                               final picked = await showDatePicker(
@@ -222,7 +222,7 @@ class _KanbanPageState extends State<KanbanPage> {
                                 });
                               }
                             },
-                            child: const Text('Pick date')),
+                            child: const Text('Выбрать дату')),
                       ]),
                     ],
                   ),
@@ -230,14 +230,14 @@ class _KanbanPageState extends State<KanbanPage> {
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel')),
+                      child: const Text('Отмена')),
                   ElevatedButton(
                     onPressed: () {
                       if (!formKey.currentState!.validate()) return;
                       formKey.currentState!.save();
                       Navigator.pop(context, true);
                     },
-                    child: const Text('Add'),
+                    child: const Text('Добавить'),
                   ),
                 ],
               )),
@@ -277,7 +277,7 @@ class _KanbanPageState extends State<KanbanPage> {
       context: context,
       builder: (context) => StatefulBuilder(
           builder: (context, dialogSetState) => AlertDialog(
-                title: const Text('Edit task'),
+                title: const Text('Редактировать задачу'),
                 content: Form(
                   key: formKey,
                   child: Column(
@@ -285,21 +285,21 @@ class _KanbanPageState extends State<KanbanPage> {
                     children: [
                       TextFormField(
                         initialValue: title,
-                        decoration: const InputDecoration(labelText: 'Title'),
+                        decoration: const InputDecoration(labelText: 'Название'),
                         onSaved: (v) => title = v ?? '',
                         validator: (v) =>
-                            (v == null || v.isEmpty) ? 'Enter title' : null,
+                            (v == null || v.isEmpty) ? 'Введите название' : null,
                       ),
                       TextFormField(
                         initialValue: desc,
                         decoration:
-                            const InputDecoration(labelText: 'Description'),
+                            const InputDecoration(labelText: 'Описание'),
                         onSaved: (v) => desc = v ?? '',
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<KanbanStatus>(
                         initialValue: status,
-                        decoration: const InputDecoration(labelText: 'Status'),
+                        decoration: const InputDecoration(labelText: 'Статус'),
                         items: KanbanStatus.values
                             .map((s) =>
                                 DropdownMenuItem(value: s, child: Text(s.name)))
@@ -310,8 +310,8 @@ class _KanbanPageState extends State<KanbanPage> {
                       Row(children: [
                         Expanded(
                           child: Text(deadline != null
-                              ? 'Due: ${deadline!.toLocal().toIso8601String().split("T").first}'
-                              : 'No deadline'),
+                              ? 'Срок: ${deadline!.toLocal().toIso8601String().split("T").first}'
+                              : 'Без срока'),
                         ),
                         TextButton(
                             onPressed: () async {
@@ -326,14 +326,14 @@ class _KanbanPageState extends State<KanbanPage> {
                                 });
                               }
                             },
-                            child: const Text('Pick date')),
+                            child: const Text('Выбрать дату')),
                       ]),
                       const SizedBox(height: 8),
                       if (task.createdBy != null)
-                        Text('Creator: ${task.createdBy!}',
+                        Text('Создатель: ${task.createdBy!}',
                             style: const TextStyle(fontSize: 12)),
                       Text(
-                          'Created: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
+                          'Создано: ${task.createdAt.toLocal().toIso8601String().split("T").first}',
                           style: const TextStyle(fontSize: 12)),
                     ],
                   ),
@@ -341,13 +341,13 @@ class _KanbanPageState extends State<KanbanPage> {
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(context, null),
-                      child: const Text('Cancel')),
+                      child: const Text('Отмена')),
                   TextButton(
                       onPressed: () async {
                         // delete
                         Navigator.pop(context, 'delete');
                       },
-                      child: const Text('Delete',
+                      child: const Text('Удалить',
                           style: TextStyle(color: Colors.red))),
                   ElevatedButton(
                     onPressed: () {
@@ -355,7 +355,7 @@ class _KanbanPageState extends State<KanbanPage> {
                       formKey.currentState!.save();
                       Navigator.pop(context, 'save');
                     },
-                    child: const Text('Save'),
+                    child: const Text('Сохранить'),
                   ),
                 ],
               )),
@@ -441,19 +441,19 @@ class _KanbanPageState extends State<KanbanPage> {
         child: Row(
           children: [
             KanbanColumn(
-                title: 'To Do',
+                title: 'К выполнению',
                 status: KanbanStatus.todo,
                 tasks: _byStatus(KanbanStatus.todo),
                 onTaskDropped: _moveTask,
                 onTaskTap: _editTaskDialog),
             KanbanColumn(
-                title: 'In Progress',
+                title: 'В процессе',
                 status: KanbanStatus.inProgress,
                 tasks: _byStatus(KanbanStatus.inProgress),
                 onTaskDropped: _moveTask,
                 onTaskTap: _editTaskDialog),
             KanbanColumn(
-                title: 'Done',
+                title: 'Завершено',
                 status: KanbanStatus.done,
                 tasks: _byStatus(KanbanStatus.done),
                 onTaskDropped: _moveTask,
@@ -527,7 +527,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
     return Scaffold(
       appBar: AppBar(
         title:
-            const Text('Kanban', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Канбан', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 4,
         flexibleSpace: Container(
@@ -540,7 +540,9 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
         actions: [
           if (_authService.currentUser != null)
             IconButton(
-                icon: const Icon(Icons.logout), onPressed: widget.onLogout),
+                icon: const Icon(Icons.logout),
+                tooltip: 'Выход',
+                onPressed: widget.onLogout),
         ],
       ),
       body: Container(
@@ -647,8 +649,8 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                           Text(_authService.currentUser != null
-                              ? 'Logged in'
-                              : 'Not logged in')
+                              ? 'Вы вошли в систему'
+                              : 'Вы не вошли в систему')
                         ])
                   ]),
                   const SizedBox(height: 20),
@@ -664,15 +666,15 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                           ? Icons.logout
                           : Icons.login),
                       label: Text(_authService.currentUser != null
-                          ? 'Logout'
-                          : 'Login')),
+                          ? 'Выход'
+                          : 'Вход')),
                   const SizedBox(height: 12),
-                  const Text('About',
+                  const Text('О приложении',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   const Text(
-                      'This is a demo Kanban app with a vibrant UI. Use the Board tab to drag & drop tasks.'),
+                      'Это демонстрационное приложение Канбан с красивым интерфейсом. Используйте вкладку "Доска" для перетаскивания задач.'),
                 ],
               ),
             ),
@@ -687,15 +689,15 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
         backgroundColor: Colors.white,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.view_kanban_outlined), label: 'Board'),
+              icon: Icon(Icons.view_kanban_outlined), label: 'Доска'),
           BottomNavigationBarItem(
               icon: Icon(Icons.today, color: Colors.deepOrange),
-              label: 'Today'),
+              label: 'Сегодня'),
           BottomNavigationBarItem(
               icon: Icon(Icons.check_circle_outline, color: Colors.green),
-              label: 'Completed'),
+              label: 'Завершено'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline), label: 'Account'),
+              icon: Icon(Icons.person_outline), label: 'Аккаунт'),
         ],
       ),
       floatingActionButton: FloatingActionButton(
