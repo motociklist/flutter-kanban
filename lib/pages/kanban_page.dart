@@ -23,10 +23,13 @@ class _KanbanPageState extends State<KanbanPage> {
   final _authService = FirebaseAuthService();
   final _taskService = FirestoreTaskService();
   StreamSubscription<List<KanbanTask>>? _tasksSub;
+  late ValueNotifier<int>
+      _selectedTabIndex; // Сохраняем индекс вкладки при смене темы
 
   @override
   void initState() {
     super.initState();
+    _selectedTabIndex = ValueNotifier(0); // Инициализируем индекс вкладки
     // Initially no local demo tasks — only show tasks coming from Firestore
     _tasks = [];
 
@@ -51,6 +54,7 @@ class _KanbanPageState extends State<KanbanPage> {
 
   @override
   void dispose() {
+    _selectedTabIndex.dispose(); // Очищаем ValueNotifier
     _unsubscribeFromTasks();
     super.dispose();
   }
@@ -469,6 +473,7 @@ class _KanbanPageState extends State<KanbanPage> {
       tasks: _tasks,
       themeNotifier: widget.isDark,
       colorForStatus: _colorForStatus,
+      selectedTabIndex: _selectedTabIndex,
     );
   }
 }
@@ -482,6 +487,8 @@ class _KanbanScaffold extends StatefulWidget {
   final List<KanbanTask> tasks;
   final Color Function(KanbanStatus, BuildContext) colorForStatus;
   final ValueNotifier<bool>? themeNotifier;
+  final ValueNotifier<int>
+      selectedTabIndex; // Для синхронизации индекса при смене темы
 
   const _KanbanScaffold({
     Key? key,
@@ -492,6 +499,7 @@ class _KanbanScaffold extends StatefulWidget {
     required this.buildBoard,
     required this.tasks,
     required this.colorForStatus,
+    required this.selectedTabIndex,
     this.themeNotifier,
   }) : super(key: key);
 
@@ -500,8 +508,22 @@ class _KanbanScaffold extends StatefulWidget {
 }
 
 class _KanbanScaffoldState extends State<_KanbanScaffold> {
-  int _selectedIndex = 0;
-  final _authService = FirebaseAuthService();
+  @override
+  void initState() {
+    super.initState();
+    // Слушаем изменения индекса из _KanbanPageState
+    widget.selectedTabIndex.addListener(_onSelectedTabChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.selectedTabIndex.removeListener(_onSelectedTabChanged);
+    super.dispose();
+  }
+
+  void _onSelectedTabChanged() {
+    setState(() {}); // Перестраиваем UI при изменении индекса
+  }
 
   void _onTap(int idx) async {
     // tabs mapping:
@@ -510,12 +532,13 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
     // 2 - Completed
     // 3 - Account/Profile
     if (idx == 3) {
-      if (_authService.currentUser == null) {
+      final authService = FirebaseAuthService();
+      if (authService.currentUser == null) {
         await widget.onLoginRequested();
         return;
       }
     }
-    setState(() => _selectedIndex = idx);
+    widget.selectedTabIndex.value = idx;
   }
 
   @override
@@ -543,7 +566,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
               end: Alignment.bottomRight),
         ),
         child: IndexedStack(
-          index: _selectedIndex,
+          index: widget.selectedTabIndex.value,
           children: [
             // Board
             widget.buildBoard(),
@@ -628,7 +651,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: widget.selectedTabIndex.value,
         onTap: _onTap,
         selectedItemColor: const Color(0xFF6A1B9A),
         unselectedItemColor: Colors.black54,
@@ -646,11 +669,14 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
               icon: Icon(Icons.person_outline), label: 'Аккаунт'),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: widget.addTask,
-        backgroundColor: const Color(0xFFFFA726),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: (widget.selectedTabIndex.value == 0 ||
+              widget.selectedTabIndex.value == 1)
+          ? FloatingActionButton(
+              onPressed: widget.addTask,
+              backgroundColor: const Color(0xFFFFA726),
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

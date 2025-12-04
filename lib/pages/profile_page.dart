@@ -37,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _editProfile() async {
     final result = await showDialog<Map<String, String>>(
       context: context,
-        builder: (context) {
+      builder: (context) {
         final nameCtrl = TextEditingController(text: _name);
         final emailCtrl = TextEditingController(text: _email);
         return AlertDialog(
@@ -141,11 +141,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: const TextStyle(color: Colors.white70)),
                             const SizedBox(height: 10),
                             Row(children: [
-                              ElevatedButton(
-                                  onPressed: _editProfile,
-                                  style: AppStyles.elevatedButtonStyle(
-                                      verticalPadding: 10),
-                                  child: const Text('Редактировать')),
+                              Expanded(
+                                child: ElevatedButton(
+                                    onPressed: _editProfile,
+                                    style: AppStyles.elevatedButtonStyle(
+                                        verticalPadding: 10),
+                                    child: const Text('Редактировать')),
+                              ),
                               const SizedBox(width: 8),
                               ElevatedButton(
                                 onPressed: () {
@@ -177,25 +179,25 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                        const Text('Ваша статистика',
+                      const Text('Ваша статистика',
                           style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600)),
+                              fontSize: 16, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                          _StatTile(
-                            label: 'К выполнению',
-                            value: todo.toString(),
-                            color: const Color(0xFFE3F2FD)),
-                          _StatTile(
-                            label: 'В процессе',
-                            value: inProgress.toString(),
-                            color: const Color(0xFFFFF3E0)),
-                          _StatTile(
-                            label: 'Завершено',
-                            value: done.toString(),
-                            color: const Color(0xFFE8F5E9)),
+                            _StatTile(
+                                label: 'К выполнению',
+                                value: todo.toString(),
+                                color: const Color(0xFFE3F2FD)),
+                            _StatTile(
+                                label: 'В процессе',
+                                value: inProgress.toString(),
+                                color: const Color(0xFFFFF3E0)),
+                            _StatTile(
+                                label: 'Завершено',
+                                value: done.toString(),
+                                color: const Color(0xFFE8F5E9)),
                           ])
                     ]),
               ),
@@ -227,8 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : ListTile(
                           leading: const Icon(Icons.palette),
                           title: const Text('Тема'),
-                          subtitle:
-                              const Text('Светлая / Тёмная (заглушка)'),
+                          subtitle: const Text('Светлая / Тёмная (заглушка)'),
                           onTap: () {}),
                   const Divider(),
                   ListTile(
