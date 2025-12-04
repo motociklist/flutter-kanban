@@ -503,21 +503,12 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
     // 0 - Board
     // 1 - Today
     // 2 - Completed
-    // 3 - Account
+    // 3 - Account/Profile
     if (idx == 3) {
-      if (_authService.currentUser != null) {
-        // Open full Profile page
-        if (mounted) {
-          await Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => ProfilePage(
-                  onLogout: widget.onLogout,
-                  tasks: widget.tasks,
-                  themeNotifier: widget.themeNotifier)));
-        }
-      } else {
+      if (_authService.currentUser == null) {
         await widget.onLoginRequested();
+        return;
       }
-      return;
     }
     setState(() => _selectedIndex = idx);
   }
@@ -628,55 +619,11 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                     .toList(),
               ),
             ),
-            // Account (static page)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    const CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Color(0xFFFFA726),
-                        child: Icon(Icons.person, color: Colors.white)),
-                    const SizedBox(width: 12),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              _authService.currentUser?.displayName ??
-                                  'Demo User',
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_authService.currentUser != null
-                              ? 'Вы вошли в систему'
-                              : 'Вы не вошли в систему')
-                        ])
-                  ]),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFA726),
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: _authService.currentUser != null
-                          ? widget.onLogout
-                          : widget.onLoginRequested,
-                      icon: Icon(_authService.currentUser != null
-                          ? Icons.logout
-                          : Icons.login),
-                      label: Text(_authService.currentUser != null
-                          ? 'Выход'
-                          : 'Вход')),
-                  const SizedBox(height: 12),
-                  const Text('О приложении',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  const Text(
-                      'Это демонстрационное приложение Канбан с красивым интерфейсом. Используйте вкладку "Доска" для перетаскивания задач.'),
-                ],
-              ),
+            // Account (Profile)
+            ProfilePage(
+              onLogout: widget.onLogout,
+              tasks: widget.tasks,
+              themeNotifier: widget.themeNotifier,
             ),
           ],
         ),
