@@ -156,7 +156,8 @@ class _KanbanPageState extends State<KanbanPage> {
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('Требуется вход'),
-          content: const Text('Пожалуйста, войдите, чтобы добавить задачи на доску.'),
+          content: const Text(
+              'Пожалуйста, войдите, чтобы добавить задачи на доску.'),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -193,10 +194,12 @@ class _KanbanPageState extends State<KanbanPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
-                        decoration: const InputDecoration(labelText: 'Название'),
+                        decoration:
+                            const InputDecoration(labelText: 'Название'),
                         onSaved: (v) => title = v ?? '',
-                        validator: (v) =>
-                            (v == null || v.isEmpty) ? 'Введите название' : null,
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Введите название'
+                            : null,
                       ),
                       TextFormField(
                         decoration:
@@ -285,10 +288,12 @@ class _KanbanPageState extends State<KanbanPage> {
                     children: [
                       TextFormField(
                         initialValue: title,
-                        decoration: const InputDecoration(labelText: 'Название'),
+                        decoration:
+                            const InputDecoration(labelText: 'Название'),
                         onSaved: (v) => title = v ?? '',
-                        validator: (v) =>
-                            (v == null || v.isEmpty) ? 'Введите название' : null,
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Введите название'
+                            : null,
                       ),
                       TextFormField(
                         initialValue: desc,
@@ -528,13 +533,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                 LinearGradient(colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)]),
           ),
         ),
-        actions: [
-          if (_authService.currentUser != null)
-            IconButton(
-                icon: const Icon(Icons.logout),
-                tooltip: 'Выход',
-                onPressed: widget.onLogout),
-        ],
+        // actions removed: logout button hidden from the top app bar
       ),
       body: Container(
         decoration: const BoxDecoration(
