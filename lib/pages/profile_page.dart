@@ -90,13 +90,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final done = _countByStatus(KanbanStatus.done);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Profile'),
-      //   elevation: 0,
-      //   flexibleSpace: Container(
-      //       decoration:
-      //           const BoxDecoration(gradient: AppStyles.backgroundGradient)),
-      // ),
       body: Container(
         decoration: const BoxDecoration(
             gradient:
