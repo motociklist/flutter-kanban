@@ -41,16 +41,6 @@ Kanban-проект на Flutter с простой авторизацией че
 flutter pub get
 ```
 
-3. Настройте Firebase для проекта:
-	 - Установите и настройте `flutterfire` CLI (опционально):
-		 ```bash
-		 dart pub global activate flutterfire_cli
-		 flutterfire configure
-		 ```
-	 - Поместите сгенерированный `lib/firebase_options.dart` в проект (если не создан).
-
-4. Запустите приложение:
-
 ```bash
 # запуск на вебе
 flutter run -d chrome
@@ -60,34 +50,3 @@ git reset --hard HEAD
 # или на подключённом устройстве / эмуляторе
 flutter run
 ```
-
-Firestore (правила безопасности)
-
-В этом проекте задачи сохраняются в Firestore по пути `users/{uid}/tasks/{taskId}` — это означает, что каждая задача принадлежит конкретному пользователю.
-Чтобы запретить доступ к задачам других пользователей, добавьте в консоли Firebase следующие правила для Firestore:
-
-```firestore
-service cloud.firestore {
-	match /databases/{database}/documents {
-		match /users/{userId}/tasks/{taskId} {
-			allow read, write: if request.auth != null && request.auth.uid == userId;
-		}
-	}
-}
-```
-
-После этого каждый пользователь сможет создавать, редактировать и удалять только свои задачи, а в UI приложение автоматически показывает только задачи для текущего пользователя.
-
-Где смотреть код
-- Точка входа: `lib/main.dart` (инициализация Firebase, StreamBuilder по `authStateChanges`)
-- Авторизация: `lib/services/firebase_auth_service.dart` и `lib/pages/login_page.dart` / `lib/pages/register_page.dart`
-- Канбан: `lib/pages/kanban_page.dart`, виджеты — `lib/widgets/kanban_card.dart`, `lib/widgets/kanban_column.dart`
-- Профиль: `lib/pages/profile_page.dart` (показывает данные `FirebaseAuth.instance.currentUser`)
-
-Советы
-- Если после настройки Firebase вход/регистрация не работают — проверьте, что в Firebase Console включены Email/Password провайдеры.
-- Для отладки аутентификации используйте логи в консоли и `flutter run -d chrome`.
-
-Если нужно, могу:
-- Помочь настроить `flutterfire configure` и `firebase_options.dart`.
-- Запустить приложение и проверить flow логина/профиля.
