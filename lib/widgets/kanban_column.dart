@@ -23,13 +23,14 @@ class KanbanColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(8),
+        margin: EdgeInsets.all(isMobile ? 4 : 8),
+        padding: EdgeInsets.all(isMobile ? 4 : 8),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
           boxShadow: const [
             BoxShadow(
                 color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
@@ -41,13 +42,14 @@ class KanbanColumn extends StatelessWidget {
             Row(
               children: [
                 Text(title,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontSize: isMobile ? 14 : 16,
+                        fontWeight: FontWeight.bold)),
                 const Spacer(),
-                CircleAvatar(radius: 12, child: Text('${tasks.length}')),
+                CircleAvatar(radius: isMobile ? 10 : 12, child: Text('${tasks.length}', style: TextStyle(fontSize: isMobile ? 12 : 14))),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: isMobile ? 4 : 8),
             Expanded(
               child: DragTarget<KanbanTask>(
                 onWillAcceptWithDetails: (details) =>
