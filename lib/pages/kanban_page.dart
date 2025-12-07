@@ -460,27 +460,60 @@ class _KanbanPageState extends State<KanbanPage> {
       addTask: _addTaskDialog,
       buildBoard: () => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-        child: Row(
-          children: [
-            KanbanColumn(
-                title: 'К выполнению',
-                status: KanbanStatus.todo,
-                tasks: _byStatus(KanbanStatus.todo),
-                onTaskDropped: _moveTask,
-                onTaskTap: _editTaskDialog),
-            KanbanColumn(
-                title: 'В процессе',
-                status: KanbanStatus.inProgress,
-                tasks: _byStatus(KanbanStatus.inProgress),
-                onTaskDropped: _moveTask,
-                onTaskTap: _editTaskDialog),
-            KanbanColumn(
-                title: 'Завершено',
-                status: KanbanStatus.done,
-                tasks: _byStatus(KanbanStatus.done),
-                onTaskDropped: _moveTask,
-                onTaskTap: _editTaskDialog),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 600) {
+              // Мобильная версия: вертикальное расположение колонок
+              return Column(
+                children: [
+                  KanbanColumn(
+                      title: 'К выполнению',
+                      status: KanbanStatus.todo,
+                      tasks: _byStatus(KanbanStatus.todo),
+                      onTaskDropped: _moveTask,
+                      onTaskTap: _editTaskDialog),
+                  const SizedBox(height: 12),
+                  KanbanColumn(
+                      title: 'В процессе',
+                      status: KanbanStatus.inProgress,
+                      tasks: _byStatus(KanbanStatus.inProgress),
+                      onTaskDropped: _moveTask,
+                      onTaskTap: _editTaskDialog),
+                  const SizedBox(height: 12),
+                  KanbanColumn(
+                      title: 'Завершено',
+                      status: KanbanStatus.done,
+                      tasks: _byStatus(KanbanStatus.done),
+                      onTaskDropped: _moveTask,
+                      onTaskTap: _editTaskDialog),
+                ],
+              );
+            } else {
+              // Десктопная версия: горизонтальное расположение колонок
+              return Row(
+                children: [
+                  KanbanColumn(
+                      title: 'К выполнению',
+                      status: KanbanStatus.todo,
+                      tasks: _byStatus(KanbanStatus.todo),
+                      onTaskDropped: _moveTask,
+                      onTaskTap: _editTaskDialog),
+                  KanbanColumn(
+                      title: 'В процессе',
+                      status: KanbanStatus.inProgress,
+                      tasks: _byStatus(KanbanStatus.inProgress),
+                      onTaskDropped: _moveTask,
+                      onTaskTap: _editTaskDialog),
+                  KanbanColumn(
+                      title: 'Завершено',
+                      status: KanbanStatus.done,
+                      tasks: _byStatus(KanbanStatus.done),
+                      onTaskDropped: _moveTask,
+                      onTaskTap: _editTaskDialog),
+                ],
+              );
+            }
+          },
         ),
       ),
       tasks: _tasks,
