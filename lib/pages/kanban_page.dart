@@ -152,6 +152,19 @@ class _KanbanPageState extends State<KanbanPage> {
     }
   }
 
+  String _statusLabel(KanbanStatus s) {
+    switch (s) {
+      case KanbanStatus.todo:
+        return 'К выполнению';
+      case KanbanStatus.inProgress:
+        return 'В процессе';
+      case KanbanStatus.done:
+        return 'Завершено';
+      default:
+        return s.name;
+    }
+  }
+
   Future<void> _addTaskDialog() async {
     if (_authService.currentUser == null) {
       // If not logged in, prompt to log in before creating tasks. We only allow
@@ -310,8 +323,8 @@ class _KanbanPageState extends State<KanbanPage> {
                         initialValue: status,
                         decoration: const InputDecoration(labelText: 'Статус'),
                         items: KanbanStatus.values
-                            .map((s) =>
-                                DropdownMenuItem(value: s, child: Text(s.name)))
+                            .map((s) => DropdownMenuItem(
+                                value: s, child: Text(_statusLabel(s))))
                             .toList(),
                         onChanged: (v) => status = v ?? status,
                       ),
