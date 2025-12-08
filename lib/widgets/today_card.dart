@@ -15,9 +15,22 @@ class TodayCard extends StatelessWidget {
   String _formatDate(DateTime d) =>
       d.toLocal().toIso8601String().split('T').first;
 
+  Color _vividColorForStatus(KanbanStatus status) {
+    switch (status) {
+      case KanbanStatus.todo:
+        return const Color(0xFF1976D2); // vivid blue
+      case KanbanStatus.inProgress:
+        return const Color(0xFFFF8F00); // vivid orange
+      case KanbanStatus.done:
+        return const Color(0xFF2E7D32); // vivid green
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final statusColor = colorForStatus(task.status, context);
+    // Use more vivid saturated colors for Today cards (do not rely on
+    // the pastel `colorForStatus` used elsewhere).
+    final statusColor = _vividColorForStatus(task.status);
 
     // nicer accent gradient tuned to app
     const accent = LinearGradient(
@@ -77,7 +90,11 @@ class TodayCard extends StatelessWidget {
             margin: const EdgeInsets.all(4),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              // make inner panel slightly translucent on light theme so
+              // gradient shows through and overall colors feel richer
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.surface
+                  : Colors.white.withOpacity(0.96),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -140,7 +157,8 @@ class TodayCard extends StatelessWidget {
                         Text(task.description!,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.grey[700])),
+                            style:
+                                TextStyle(color: titleColor.withOpacity(0.85))),
                       ],
                       const SizedBox(height: 10),
                       Row(
@@ -170,11 +188,12 @@ class TodayCard extends StatelessWidget {
                             const SizedBox(width: 12),
                           ],
                           const Icon(Icons.access_time,
-                              size: 14, color: Colors.black38),
+                              size: 14, color: Colors.grey),
                           const SizedBox(width: 6),
                           Text('Создано: ${_formatDate(task.createdAt)}',
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.black54)),
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: titleColor.withOpacity(0.7))),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -182,14 +201,15 @@ class TodayCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(task.createdBy ?? '',
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.black45)),
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: titleColor.withOpacity(0.6))),
                           const Row(children: [
-                            Icon(Icons.edit, size: 14, color: Colors.black26),
+                            Icon(Icons.edit, size: 14, color: Colors.grey),
                             SizedBox(width: 6),
                             Text('Редактировать',
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.black26))
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.grey))
                           ])
                         ],
                       )
