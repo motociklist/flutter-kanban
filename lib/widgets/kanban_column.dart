@@ -66,6 +66,8 @@ class KanbanColumn extends StatelessWidget {
                   final isHovering = candidateData.isNotEmpty;
 
                   return Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(minHeight: 120),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: isHovering
