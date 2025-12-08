@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'login_page.dart';
 import '../styles/styles.dart';
 import '../models/kanban_task.dart';
 
@@ -146,8 +147,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                 onPressed: () {
                                   if (widget.onLogout != null) {
                                     widget.onLogout!();
-                                    Navigator.pop(context);
                                   }
+                                  // Перейти на страницу входа и очистить стек,
+                                  // чтобы пользователь не мог вернуться назад.
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (_) => LoginPage(
+                                              onLogin: () {},
+                                            )),
+                                    (route) => false,
+                                  );
                                 },
                                 style: AppStyles.elevatedButtonStyle(
                                     verticalPadding: 10),
