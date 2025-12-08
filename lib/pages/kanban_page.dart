@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/kanban_task.dart';
 import '../widgets/kanban_column.dart';
+import '../widgets/today_card.dart';
 import 'login_page.dart';
 import 'register_page.dart';
 import 'profile_page.dart';
@@ -457,6 +458,9 @@ class _KanbanPageState extends State<KanbanPage> {
       onLogout: () {
         _authService.signOut();
       },
+      onEditTask: (task) async {
+        await _editTaskDialog(task);
+      },
       addTask: _addTaskDialog,
       buildBoard: () => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
@@ -526,6 +530,7 @@ class _KanbanPageState extends State<KanbanPage> {
 
 class _KanbanScaffold extends StatefulWidget {
   final VoidCallback onLogout;
+  final Future<void> Function(KanbanTask) onEditTask;
   final Future<void> Function() onLoginRequested;
   final Future<void> Function() onRegisterRequested;
   final Future<void> Function() addTask;
@@ -539,6 +544,7 @@ class _KanbanScaffold extends StatefulWidget {
   const _KanbanScaffold({
     Key? key,
     required this.onLogout,
+    required this.onEditTask,
     required this.onLoginRequested,
     required this.onRegisterRequested,
     required this.addTask,
@@ -616,7 +622,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
           children: [
             // Board
             widget.buildBoard(),
-            // Today: tasks created today
+            // Today: задачи, созданные сегодня — показываем в виде информативных карточек
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: ListView(
@@ -629,26 +635,12 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
                     })
                     .map((t) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 6.0),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                                color: widget.colorForStatus(t.status, context),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: const [
-                                  BoxShadow(
-                                      color: Colors.black12, blurRadius: 4)
-                                ]),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(t.title,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600)),
-                                  if (t.description != null)
-                                    Text(t.description!,
-                                        style: const TextStyle(
-                                            color: Colors.black54))
-                                ]),
+                          child: TodayCard(
+                            task: t,
+                            colorForStatus: widget.colorForStatus,
+                            onTap: (task) async {
+                              await widget.onEditTask(task);
+                            },
                           ),
                         ))
                     .toList(),
