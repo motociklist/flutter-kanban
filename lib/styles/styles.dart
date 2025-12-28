@@ -125,7 +125,7 @@ class AppStyles {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     dividerColor: Colors.grey.shade800,
-    listTileTheme: ListTileThemeData(
+    listTileTheme: const ListTileThemeData(
       textColor: darkTextPrimary, // Светло-серый вместо белого
       iconColor: darkTextSecondary, // Серый для иконок
     ),
