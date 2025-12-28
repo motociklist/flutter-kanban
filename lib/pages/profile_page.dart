@@ -128,11 +128,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     CircleAvatar(
                         radius: 36,
-                        backgroundColor:
-                            const Color.fromRGBO(255, 255, 255, 0.18),
+                        backgroundColor: isDark
+                            ? AppStyles.darkTextPrimary.withValues(alpha: 0.18)
+                            : const Color.fromRGBO(255, 255, 255, 0.18),
                         child: Text(_name.isNotEmpty ? _name[0] : 'U',
-                            style: const TextStyle(
-                                color: Colors.white,
+                            style: TextStyle(
+                                color: isDark
+                                    ? AppStyles.darkTextPrimary
+                                    : Colors.white,
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold))),
                     const SizedBox(width: 16),
@@ -141,13 +144,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(_name,
-                                style: const TextStyle(
-                                    color: Colors.white,
+                                style: TextStyle(
+                                    color: isDark
+                                        ? AppStyles.darkTextPrimary
+                                        : Colors.white,
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold)),
                             const SizedBox(height: 6),
                             Text(_email,
-                                style: const TextStyle(color: Colors.white70)),
+                                style: TextStyle(
+                                    color: isDark
+                                        ? AppStyles.darkTextSecondary
+                                        : Colors.white70)),
                             const SizedBox(height: 10),
                             Row(children: [
                               Expanded(
@@ -175,8 +183,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 },
                                 style: AppStyles.elevatedButtonStyle(
                                     verticalPadding: 10),
-                                child: const Text('Выйти',
-                                    style: TextStyle(color: Colors.white)),
+                                child: Text('Выйти',
+                                    style: TextStyle(
+                                        color: isDark
+                                            ? AppStyles.darkTextPrimary
+                                            : Colors.white)),
                               ),
                             ])
                           ]),
@@ -188,10 +199,14 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? AppStyles.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 6)
+                    boxShadow: [
+                      BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.5)
+                              : Colors.black12,
+                          blurRadius: 6)
                     ]),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,10 +249,14 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? AppStyles.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 6)
+                    boxShadow: [
+                      BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.5)
+                              : Colors.black12,
+                          blurRadius: 6)
                     ]),
                 child: Column(children: [
                   widget.themeMode != null
@@ -363,7 +382,7 @@ class _StatTile extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
+                        ? AppStyles.darkTextPrimary
                         : Colors.black87)),
             const SizedBox(height: 6),
             Text(label,

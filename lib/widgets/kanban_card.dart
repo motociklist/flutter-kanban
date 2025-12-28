@@ -42,10 +42,12 @@ class KanbanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = task.color ?? colorForStatus(task.status, context);
-    final textColor =
-        ThemeData.estimateBrightnessForColor(bg) == Brightness.dark
-            ? Colors.white
-            : Colors.black87;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = ThemeData.estimateBrightnessForColor(bg) == Brightness.dark
+        ? (isDark
+            ? const Color(0xFFE8E8E8) // Светло-серый вместо белого для темной темы
+            : Colors.white)
+        : Colors.black87;
 
     return GestureDetector(
       onTap: () {
@@ -85,10 +87,12 @@ class KanbanCard extends StatelessWidget {
               ),
               child: Text(
                 _getStatusLabel(task.status),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: isDark
+                      ? const Color(0xFFE8E8E8)
+                      : Colors.white,
                 ),
               ),
             ),

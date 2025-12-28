@@ -41,8 +41,10 @@ class TodayCard extends StatelessWidget {
 
     final bg = Theme.of(context).colorScheme.surface;
     final brightness = ThemeData.estimateBrightnessForColor(bg);
-    final titleColor =
-        brightness == Brightness.dark ? Colors.white : Colors.black87;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark
+        ? const Color(0xFFE8E8E8) // Светло-серый вместо белого
+        : Colors.black87;
 
     // deadline urgency
     Color? deadlineColor;
@@ -92,7 +94,7 @@ class TodayCard extends StatelessWidget {
             decoration: BoxDecoration(
               // make inner panel slightly translucent on light theme so
               // gradient shows through and overall colors feel richer
-              color: Theme.of(context).brightness == Brightness.dark
+              color: isDark
                   ? Theme.of(context).colorScheme.surface
                   : Colors.white.withValues(alpha: 0.96),
               borderRadius: BorderRadius.circular(12),
@@ -105,8 +107,11 @@ class TodayCard extends StatelessWidget {
                   radius: 22,
                   backgroundColor: statusColor,
                   child: Text(createdByInitial,
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w700)),
+                      style: TextStyle(
+                          color: isDark
+                              ? const Color(0xFFE8E8E8)
+                              : Colors.white,
+                          fontWeight: FontWeight.w700)),
                 ),
                 const SizedBox(width: 12),
                 // main content
@@ -143,9 +148,11 @@ class TodayCard extends StatelessWidget {
                             ),
                             child: Text(
                               _statusLabel(task.status),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white,
+                                  color: isDark
+                                      ? const Color(0xFFE8E8E8)
+                                      : Colors.white,
                                   fontWeight: FontWeight.w700),
                             ),
                           )

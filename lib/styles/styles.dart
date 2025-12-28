@@ -15,6 +15,9 @@ class AppStyles {
   static const Color darkSurface = Color(0xFF1E1E1E); // Surface для карточек
   static const Color darkSurfaceVariant = Color(0xFF252525); // Вариант surface
   static const Color darkAppBar = Color(0xFF1E1B2E); // AppBar фон
+  // Альтернатива белому для темной темы - светло-серый с легким теплым оттенком
+  static const Color darkTextPrimary = Color(0xFFE8E8E8); // Светло-серый вместо белого
+  static const Color darkTextSecondary = Color(0xFFB8B8B8); // Серый для вторичного текста
 
   static const LinearGradient backgroundGradient = LinearGradient(
     colors: [secondary, primary],
@@ -60,7 +63,7 @@ class AppStyles {
         padding: EdgeInsets.symmetric(vertical: verticalPadding),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         backgroundColor: primaryDark, // Яркий фиолетовый для темной темы
-        foregroundColor: Colors.white,
+        foregroundColor: darkTextPrimary, // Светло-серый вместо белого
         elevation: 4,
       );
 
@@ -84,10 +87,10 @@ class AppStyles {
       secondary: secondaryDark,
       surface: darkSurface,
       surfaceContainerHighest: darkSurfaceVariant,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.white,
-      error: Color(0xFFCF6679), // Мягкий красный для ошибок
+      onPrimary: darkTextPrimary, // Светло-серый вместо белого
+      onSecondary: darkTextPrimary, // Светло-серый вместо белого
+      onSurface: darkTextPrimary, // Светло-серый вместо белого
+      error: Color(0xFFE57373), // Более яркий красный для ошибок
     ),
     primaryColor: primaryDark,
     scaffoldBackgroundColor: darkBackground,
@@ -95,9 +98,9 @@ class AppStyles {
     appBarTheme: const AppBarTheme(
       backgroundColor: darkAppBar,
       elevation: 0,
-      foregroundColor: Colors.white,
+      foregroundColor: darkTextPrimary, // Светло-серый вместо белого
       titleTextStyle: TextStyle(
-        color: Colors.white,
+        color: darkTextPrimary, // Светло-серый вместо белого
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
@@ -123,8 +126,8 @@ class AppStyles {
     ),
     dividerColor: Colors.grey.shade800,
     listTileTheme: ListTileThemeData(
-      textColor: Colors.white,
-      iconColor: Colors.grey.shade300,
+      textColor: darkTextPrimary, // Светло-серый вместо белого
+      iconColor: darkTextSecondary, // Серый для иконок
     ),
   );
 
@@ -144,11 +147,11 @@ class AppStyles {
   static Color statusColorDark(KanbanStatus status) {
     switch (status) {
       case KanbanStatus.todo:
-        return const Color(0xFF2C3E6B); // Темно-синий с фиолетовым оттенком
+        return const Color(0xFF1E3A5F); // Более темный и насыщенный синий
       case KanbanStatus.inProgress:
-        return const Color(0xFF6B4C3A); // Темно-оранжевый/коричневый
+        return const Color(0xFF7D4E2E); // Более яркий оранжево-коричневый
       case KanbanStatus.done:
-        return const Color(0xFF3A5C3A); // Темно-зеленый
+        return const Color(0xFF2D5A2D); // Более насыщенный зеленый
     }
   }
 
