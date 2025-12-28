@@ -25,13 +25,18 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserData();
   }
 
-  void _loadUserData() {
+  void _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      setState(() {
-        _name = user.displayName ?? 'User';
-        _email = user.email ?? 'demo@example.com';
-      });
+      // Перезагружаем профиль пользователя, чтобы получить актуальные данные
+      await user.reload();
+      final updatedUser = FirebaseAuth.instance.currentUser;
+      if (updatedUser != null && mounted) {
+        setState(() {
+          _name = updatedUser.displayName ?? 'User';
+          _email = updatedUser.email ?? 'demo@example.com';
+        });
+      }
     }
   }
 
@@ -185,22 +190,31 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _StatTile(
-                                label: 'К выполнению',
-                                value: todo.toString(),
-                                color: const Color(0xFFE3F2FD)),
-                            _StatTile(
-                                label: 'В процессе',
-                                value: inProgress.toString(),
-                                color: const Color(0xFFFFF3E0)),
-                            _StatTile(
-                                label: 'Завершено',
-                                value: done.toString(),
-                                color: const Color(0xFFE8F5E9)),
-                          ])
+                      IntrinsicHeight(
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                child: _StatTile(
+                                    label: 'К выполнению',
+                                    value: todo.toString(),
+                                    color: const Color(0xFFE3F2FD)),
+                              ),
+                              Expanded(
+                                child: _StatTile(
+                                    label: 'В процессе',
+                                    value: inProgress.toString(),
+                                    color: const Color(0xFFFFF3E0)),
+                              ),
+                              Expanded(
+                                child: _StatTile(
+                                    label: 'Завершено',
+                                    value: done.toString(),
+                                    color: const Color(0xFFE8F5E9)),
+                              ),
+                            ]),
+                      )
                     ]),
               ),
               const SizedBox(height: 16),
@@ -267,20 +281,26 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        decoration: BoxDecoration(
-            color: color, borderRadius: BorderRadius.circular(10)),
-        child: Column(children: [
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Text(label, style: const TextStyle(color: Colors.black54))
-        ]),
-      ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Text(value,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Text(label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis)
+          ]),
     );
   }
 }
