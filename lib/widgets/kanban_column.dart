@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/kanban_task.dart';
 import 'kanban_card.dart';
+import '../styles/styles.dart';
 
 typedef OnTaskDropped = void Function(KanbanTask task, KanbanStatus toStatus);
 typedef OnTaskTap = Future<void> Function(KanbanTask task);
@@ -224,15 +225,6 @@ class KanbanColumn extends StatelessWidget {
   }
 
   Color _colorForStatus(KanbanStatus status, BuildContext context) {
-    switch (status) {
-      case KanbanStatus.todo:
-        return const Color(0xFFE3F2FD); // light blue
-      case KanbanStatus.inProgress:
-        return const Color(0xFFFFF3E0); // light orange
-      case KanbanStatus.done:
-        return const Color(0xFFE8F5E9); // light green
-      default:
-        return Theme.of(context).cardColor;
-    }
+    return AppStyles.statusColor(status, context);
   }
 }

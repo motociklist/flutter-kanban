@@ -7,12 +7,16 @@ import 'register_page.dart';
 import 'profile_page.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/firestore_task_service.dart';
+import '../styles/styles.dart';
 import 'dart:async';
 
 class KanbanPage extends StatefulWidget {
   final ValueNotifier<bool>? firstLaunch;
-  final ValueNotifier<bool>? isDark;
-  const KanbanPage({Key? key, this.firstLaunch, this.isDark}) : super(key: key);
+  final ValueNotifier<ThemeMode>? themeMode;
+  final ValueNotifier<int>? selectedTabIndex;
+  const KanbanPage(
+      {Key? key, this.firstLaunch, this.themeMode, this.selectedTabIndex})
+      : super(key: key);
 
   @override
   State<KanbanPage> createState() => _KanbanPageState();
@@ -24,13 +28,14 @@ class _KanbanPageState extends State<KanbanPage> {
   final _authService = FirebaseAuthService();
   final _taskService = FirestoreTaskService();
   StreamSubscription<List<KanbanTask>>? _tasksSub;
-  late ValueNotifier<int>
+  late final ValueNotifier<int>
       _selectedTabIndex; // Сохраняем индекс вкладки при смене темы
 
   @override
   void initState() {
     super.initState();
-    _selectedTabIndex = ValueNotifier(0); // Инициализируем индекс вкладки
+    // Используем переданный selectedTabIndex или создаем новый
+    _selectedTabIndex = widget.selectedTabIndex ?? ValueNotifier(0);
     // Initially no local demo tasks — only show tasks coming from Firestore
     _tasks = [];
 
@@ -55,7 +60,10 @@ class _KanbanPageState extends State<KanbanPage> {
 
   @override
   void dispose() {
-    _selectedTabIndex.dispose(); // Очищаем ValueNotifier
+    // Очищаем ValueNotifier только если мы его создали сами
+    if (widget.selectedTabIndex == null) {
+      _selectedTabIndex.dispose();
+    }
     _unsubscribeFromTasks();
     super.dispose();
   }
@@ -427,16 +435,7 @@ class _KanbanPageState extends State<KanbanPage> {
   }
 
   Color _colorForStatus(KanbanStatus status, BuildContext context) {
-    switch (status) {
-      case KanbanStatus.todo:
-        return const Color(0xFFE3F2FD);
-      case KanbanStatus.inProgress:
-        return const Color(0xFFFFF3E0);
-      case KanbanStatus.done:
-        return const Color(0xFFE8F5E9);
-      default:
-        return Theme.of(context).cardColor;
-    }
+    return AppStyles.statusColor(status, context);
   }
 
   @override
@@ -521,7 +520,7 @@ class _KanbanPageState extends State<KanbanPage> {
         ),
       ),
       tasks: _tasks,
-      themeNotifier: widget.isDark,
+      themeMode: widget.themeMode,
       colorForStatus: _colorForStatus,
       selectedTabIndex: _selectedTabIndex,
     );
@@ -537,7 +536,7 @@ class _KanbanScaffold extends StatefulWidget {
   final Widget Function() buildBoard;
   final List<KanbanTask> tasks;
   final Color Function(KanbanStatus, BuildContext) colorForStatus;
-  final ValueNotifier<bool>? themeNotifier;
+  final ValueNotifier<ThemeMode>? themeMode;
   final ValueNotifier<int>
       selectedTabIndex; // Для синхронизации индекса при смене темы
 
@@ -552,7 +551,7 @@ class _KanbanScaffold extends StatefulWidget {
     required this.tasks,
     required this.colorForStatus,
     required this.selectedTabIndex,
-    this.themeNotifier,
+    this.themeMode,
   }) : super(key: key);
 
   @override
@@ -595,6 +594,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title:
@@ -602,20 +602,24 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
         centerTitle: true,
         elevation: 4,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient:
-                //fixme
-                LinearGradient(colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)]),
+          decoration: BoxDecoration(
+            gradient: isDark
+                ? const LinearGradient(
+                    colors: [Color(0xFF1E1B2E), Color(0xFF2D1B3E)])
+                : const LinearGradient(
+                    colors: [Color(0xFF42A5F5), Color(0xFF7E57C2)]),
           ),
         ),
         // actions removed: logout button hidden from the top app bar
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              colors: [Color(0xFFF3F7FF), Color(0xFFE8F5FF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? AppStyles.backgroundGradientDark
+              : const LinearGradient(
+                  colors: [Color(0xFFF3F7FF), Color(0xFFE8F5FF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight),
         ),
         child: IndexedStack(
           index: widget.selectedTabIndex.value,
@@ -683,7 +687,7 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
             ProfilePage(
               onLogout: widget.onLogout,
               tasks: widget.tasks,
-              themeNotifier: widget.themeNotifier,
+              themeMode: widget.themeMode,
             ),
           ],
         ),
