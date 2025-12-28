@@ -695,9 +695,15 @@ class _KanbanScaffoldState extends State<_KanbanScaffold> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.selectedTabIndex.value,
         onTap: _onTap,
-        selectedItemColor: const Color(0xFF6A1B9A),
-        unselectedItemColor: Colors.black54,
-        backgroundColor: Colors.white,
+        selectedItemColor: isDark
+            ? AppStyles.primaryDark
+            : const Color(0xFF6A1B9A),
+        unselectedItemColor: isDark
+            ? AppStyles.darkTextSecondary
+            : Colors.black54,
+        backgroundColor: isDark
+            ? AppStyles.darkSurface
+            : Colors.white,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.view_kanban_outlined), label: 'Доска'),
