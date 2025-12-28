@@ -39,8 +39,6 @@ class TodayCard extends StatelessWidget {
       end: Alignment.bottomRight,
     );
 
-    final bg = Theme.of(context).colorScheme.surface;
-    final brightness = ThemeData.estimateBrightnessForColor(bg);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleColor = isDark
         ? const Color(0xFFE8E8E8) // Светло-серый вместо белого
@@ -108,9 +106,8 @@ class TodayCard extends StatelessWidget {
                   backgroundColor: statusColor,
                   child: Text(createdByInitial,
                       style: TextStyle(
-                          color: isDark
-                              ? const Color(0xFFE8E8E8)
-                              : Colors.white,
+                          color:
+                              isDark ? const Color(0xFFE8E8E8) : Colors.white,
                           fontWeight: FontWeight.w700)),
                 ),
                 const SizedBox(width: 12),
@@ -164,8 +161,8 @@ class TodayCard extends StatelessWidget {
                         Text(task.description!,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style:
-                                TextStyle(color: titleColor.withValues(alpha: 0.85))),
+                            style: TextStyle(
+                                color: titleColor.withValues(alpha: 0.85))),
                       ],
                       const SizedBox(height: 10),
                       Row(
