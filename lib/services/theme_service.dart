@@ -20,16 +20,17 @@ class ThemeService {
   }
 
   // Получить ThemeMode на основе сохраненных настроек и системной темы
-  static Future<ThemeMode> getThemeModeForApp(BuildContext? context) async {
+  // ВАЖНО: не использовать BuildContext здесь, так как это может быть вызвано через async gap
+  // Вместо этого используйте ThemeMode.system в MaterialApp, он автоматически следует системной теме
+  static Future<ThemeMode> getThemeModeForApp(Brightness? systemBrightness) async {
     final savedMode = await getThemeMode();
 
     if (savedMode == _themeModeSystem) {
       // Следовать системной теме
-      if (context != null) {
-        final brightness = MediaQuery.of(context).platformBrightness;
-        return brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+      if (systemBrightness != null) {
+        return systemBrightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
       }
-      // Если контекста нет, используем светлую тему по умолчанию
+      // Если системная тема неизвестна, используем светлую тему по умолчанию
       return ThemeMode.light;
     } else if (savedMode == _themeModeDark) {
       return ThemeMode.dark;

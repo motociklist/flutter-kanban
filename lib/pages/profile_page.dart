@@ -119,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   boxShadow: [
                     BoxShadow(
                         color: isDark
-                            ? Colors.black.withOpacity(0.5)
+                            ? Colors.black.withValues(alpha: 0.5)
                             : Colors.black12,
                         blurRadius: 8)
                   ],
