@@ -3,12 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
 import '../styles/styles.dart';
 import '../models/kanban_task.dart';
+import '../services/theme_service.dart';
 
 class ProfilePage extends StatefulWidget {
   final VoidCallback? onLogout;
   final List<KanbanTask>? tasks;
-  final ValueNotifier<bool>? themeNotifier;
-  const ProfilePage({Key? key, this.onLogout, this.tasks, this.themeNotifier})
+  final ValueNotifier<ThemeMode>? themeMode;
+  const ProfilePage({Key? key, this.onLogout, this.tasks, this.themeMode})
       : super(key: key);
 
   @override
@@ -95,11 +96,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final inProgress = _countByStatus(KanbanStatus.inProgress);
     final done = _countByStatus(KanbanStatus.done);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-            gradient:
-                LinearGradient(colors: [Color(0xFFF7FAFF), Color(0xFFF0F4FF)])),
+        decoration: BoxDecoration(
+            gradient: isDark
+                ? AppStyles.backgroundGradientDark
+                : const LinearGradient(
+                    colors: [Color(0xFFF7FAFF), Color(0xFFF0F4FF)])),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -108,10 +112,16 @@ class _ProfilePageState extends State<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: AppStyles.backgroundGradient,
+                  gradient: isDark
+                      ? AppStyles.backgroundGradientDark
+                      : AppStyles.backgroundGradient,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 8)
+                  boxShadow: [
+                    BoxShadow(
+                        color: isDark
+                            ? Colors.black.withOpacity(0.5)
+                            : Colors.black12,
+                        blurRadius: 8)
                   ],
                 ),
                 child: Row(
@@ -199,19 +209,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: _StatTile(
                                     label: 'К выполнению',
                                     value: todo.toString(),
-                                    color: const Color(0xFFE3F2FD)),
+                                    color: AppStyles.statusColor(
+                                        KanbanStatus.todo, context)),
                               ),
                               Expanded(
                                 child: _StatTile(
                                     label: 'В процессе',
                                     value: inProgress.toString(),
-                                    color: const Color(0xFFFFF3E0)),
+                                    color: AppStyles.statusColor(
+                                        KanbanStatus.inProgress, context)),
                               ),
                               Expanded(
                                 child: _StatTile(
                                     label: 'Завершено',
                                     value: done.toString(),
-                                    color: const Color(0xFFE8F5E9)),
+                                    color: AppStyles.statusColor(
+                                        KanbanStatus.done, context)),
                               ),
                             ]),
                       )
@@ -227,18 +240,69 @@ class _ProfilePageState extends State<ProfilePage> {
                       BoxShadow(color: Colors.black12, blurRadius: 6)
                     ]),
                 child: Column(children: [
-                  widget.themeNotifier != null
-                      ? ValueListenableBuilder<bool>(
-                          valueListenable: widget.themeNotifier!,
-                          builder: (context, isDark, _) {
+                  widget.themeMode != null
+                      ? ValueListenableBuilder<ThemeMode>(
+                          valueListenable: widget.themeMode!,
+                          builder: (context, mode, _) {
+                            String subtitle;
+                            bool switchValue;
+
+                            if (mode == ThemeMode.dark) {
+                              subtitle = 'Тёмная';
+                              switchValue = true;
+                            } else if (mode == ThemeMode.light) {
+                              subtitle = 'Светлая';
+                              switchValue = false;
+                            } else {
+                              subtitle = 'Системная';
+                              switchValue = Theme.of(context).brightness ==
+                                  Brightness.dark;
+                            }
+
                             return ListTile(
                               leading: const Icon(Icons.palette),
                               title: const Text('Тема'),
-                              subtitle: Text(isDark ? 'Тёмная' : 'Светлая'),
-                              trailing: Switch(
-                                  value: isDark,
-                                  onChanged: (v) =>
-                                      widget.themeNotifier?.value = v),
+                              subtitle: Text(subtitle),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    switchValue ? 'Тёмная' : 'Светлая',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Switch(
+                                    value: switchValue,
+                                    onChanged: (v) async {
+                                      // Переключаем между светлой и темной, но не системной
+                                      final newMode =
+                                          v ? ThemeMode.dark : ThemeMode.light;
+                                      widget.themeMode?.value = newMode;
+                                      await ThemeService.setThemeModeEnum(
+                                          newMode);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              onTap: () async {
+                                // При нажатии на элемент переключаем между тремя режимами
+                                ThemeMode newMode;
+                                if (mode == ThemeMode.light) {
+                                  newMode = ThemeMode.dark;
+                                } else if (mode == ThemeMode.dark) {
+                                  newMode = ThemeMode.system;
+                                } else {
+                                  newMode = ThemeMode.light;
+                                }
+                                widget.themeMode?.value = newMode;
+                                await ThemeService.setThemeModeEnum(newMode);
+                              },
                             );
                           },
                         )
@@ -262,7 +326,10 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 24),
               Center(
                   child: Text('Сделано с ❤️ — Kanban+',
-                      style: TextStyle(color: Colors.grey[600]))),
+                      style: TextStyle(
+                          color: isDark
+                              ? Colors.grey.shade400
+                              : Colors.grey[600]))),
             ],
           ),
         ),
@@ -292,12 +359,19 @@ class _StatTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: [
             Text(value,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87)),
             const SizedBox(height: 6),
             Text(label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.black54),
+                style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey.shade300
+                        : Colors.black54),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis)
           ]),
