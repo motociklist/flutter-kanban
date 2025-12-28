@@ -94,7 +94,7 @@ class TodayCard extends StatelessWidget {
               // gradient shows through and overall colors feel richer
               color: Theme.of(context).brightness == Brightness.dark
                   ? Theme.of(context).colorScheme.surface
-                  : Colors.white.withOpacity(0.96),
+                  : Colors.white.withValues(alpha: 0.96),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -158,7 +158,7 @@ class TodayCard extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style:
-                                TextStyle(color: titleColor.withOpacity(0.85))),
+                                TextStyle(color: titleColor.withValues(alpha: 0.85))),
                       ],
                       const SizedBox(height: 10),
                       Row(
@@ -193,7 +193,7 @@ class TodayCard extends StatelessWidget {
                           Text('Создано: ${_formatDate(task.createdAt)}',
                               style: TextStyle(
                                   fontSize: 12,
-                                  color: titleColor.withOpacity(0.7))),
+                                  color: titleColor.withValues(alpha: 0.7))),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -203,7 +203,7 @@ class TodayCard extends StatelessWidget {
                           Text(task.createdBy ?? '',
                               style: TextStyle(
                                   fontSize: 12,
-                                  color: titleColor.withOpacity(0.6))),
+                                  color: titleColor.withValues(alpha: 0.6))),
                           const Row(children: [
                             Icon(Icons.edit, size: 14, color: Colors.grey),
                             SizedBox(width: 6),

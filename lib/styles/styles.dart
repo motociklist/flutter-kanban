@@ -79,26 +79,24 @@ class AppStyles {
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     useMaterial3: true,
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: primaryDark,
       secondary: secondaryDark,
       surface: darkSurface,
-      surfaceVariant: darkSurfaceVariant,
-      background: darkBackground,
+      surfaceContainerHighest: darkSurfaceVariant,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: Colors.white,
-      onBackground: Colors.white,
-      error: const Color(0xFFCF6679), // Мягкий красный для ошибок
+      error: Color(0xFFCF6679), // Мягкий красный для ошибок
     ),
     primaryColor: primaryDark,
     scaffoldBackgroundColor: darkBackground,
     cardColor: darkSurface,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: darkAppBar,
       elevation: 0,
       foregroundColor: Colors.white,
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         color: Colors.white,
         fontSize: 20,
         fontWeight: FontWeight.bold,
@@ -115,7 +113,7 @@ class AppStyles {
         borderSide: BorderSide(color: Colors.grey.shade700),
       ),
       focusedBorder: inputBorder.copyWith(
-        borderSide: BorderSide(color: primaryDark, width: 2),
+        borderSide: const BorderSide(color: primaryDark, width: 2),
       ),
     ),
     cardTheme: CardThemeData(
